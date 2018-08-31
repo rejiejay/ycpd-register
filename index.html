@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0" />
+    <title>注册</title>
+    <script>
+        if (!window.Promise) {
+            document.writeln('<script type="text/javascript" src="https://cdn.bootcss.com/es6-promise/4.1.1/es6-promise.min.js"' + '>' + '<' + '/' + 'script>');
+        }
+        if (!window.fetch) {
+            document.writeln('<script type="text/javascript" src="https://cdn.bootcss.com/fetch/2.0.3/fetch.min.js"' + '>' + '<' + '/' + 'script>');
+        }
+    </script>
+    <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script> -->
+    <script type="text/javascript" src="https://ycpd-assets.oss-cn-shenzhen.aliyuncs.com/ycpd/javascript/vue.js"></script>
+    <script type="text/javascript" src="https://ycpd-assets.oss-cn-shenzhen.aliyuncs.com/ycpd/javascript/vue-router.min.js"></script>
+    <script type="text/javascript" src="https://ycpd-assets.oss-cn-shenzhen.aliyuncs.com/ycpd/javascript/mint-ui.js"></script>
+    <link href="https://ycpd-assets.oss-cn-shenzhen.aliyuncs.com/ycpd/css/mint-ui.min.css" rel="stylesheet" />
+    <script type="text/javascript" src="https://ycpd-assets.oss-cn-shenzhen.aliyuncs.com/ycpd/javascript/jquery-ajax-builder.min.js"></script>
+    <script type="text/javascript" src="https://ycpd-assets.oss-cn-shenzhen.aliyuncs.com/ycpd/javascript/jquery-ajax-builder.min.js"></script>
+    <link href="./index.css" rel="stylesheet" />
+</head>
+
+<body>
+
+    <div id="app">
+        <keep-alive>
+            <router-view></router-view>
+        </keep-alive>
+    </div>
+
+    <!-- 注册 -->
+    <script type="text/template" id="register">
+        <div>
+        </div>
+	</script>
+
+    <!-- 完善车辆信息 -->
+    <script type="text/template" id="supplement">
+        <div>
+        </div>
+    </script>
+    <script type="text/javascript" src="./index.js"></script>
+</body>
+
+</html>
