@@ -179,6 +179,9 @@ var VmSupplement = { // 完善车辆信息 Vue类
 
 			// 实例 (车牌选择) 
 			myCarKeyBoard: function () {}, 
+
+			// 
+			dialogTip: false,
 		}
 	},
 
