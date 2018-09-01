@@ -33,9 +33,12 @@ var init = {
 		// 路由配置
 		var routes = [
 			{
-				path: '/',
+				path: '/', // 注册
 				component: VmMain
-			}, {
+			}, { // 我的车辆列表
+				path: '/mycar',
+				component: VmMyCar
+			}, { // 
 				path: '/supplement',
 				component: VmSupplement
 			}
@@ -98,6 +101,8 @@ var VmMain = { // 注册 Vue类
 			phoneValue: '',
 			// 验证号码
 			verifyNumber: '',
+			// 是否 正在获取验证码
+			isVerifyGeting: false,
 			// 是否同意协议
 			isAgreement: false,
 		};
@@ -105,7 +110,38 @@ var VmMain = { // 注册 Vue类
 
 	mounted: function mounted() { },
 
-	methods: {},
+	methods: {
+		/**
+		 * 获取验证码
+		 */
+		verifyNumberHandle: function verifyNumberHandle() {
+
+		}
+	},
+};
+
+var VmMyCar = { // 完善车辆信息 Vue类
+	template: '#mycar',
+
+	data: function data() {
+		return {
+		}
+	},
+
+	mounted: function mounted() {
+	},
+
+	methods: {
+
+	}
+}
+
+// 抽象的方法
+var utils = {
+	// 获取URL参数
+	loadPageVar: function loadPageVar(sVar) {
+		return decodeURI(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURI(sVar).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+	},
 };
 
 var VmSupplement = { // 完善车辆信息 Vue类

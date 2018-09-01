@@ -51,7 +51,9 @@
                             <input v-model="verifyNumber" placeholder="输入6位手机验证码" />
                         </div>
                         <div class="input-item-verify">
-                            <div class="item-verify-content">获取验证码</div>
+                            <div class="item-verify-content"
+                                @click="verifyNumberHandle"
+                            >获取验证码</div>
                         </div>
                     </div>
                 </div>
@@ -79,13 +81,20 @@
             </div>
         </div>
     </div>
-	</script>
+    </script>
+    
+    <!-- 我的车辆信息 -->
+    <script type="text/template" id="mycar">
+        <div class="mycar">
+        </div>
+    </script>
 
     <!-- 完善车辆信息 -->
     <script type="text/template" id="supplement">
-        <div>
+        <div class="supplement">
         </div>
     </script>
+
     <script type="text/javascript" src="./index.js"></script>
 </body>
 
