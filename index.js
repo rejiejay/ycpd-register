@@ -166,6 +166,51 @@ var VmMyCar = { // 完善车辆信息 Vue类
 	}
 }
 
+var VmSupplement = { // 完善车辆信息 Vue类
+	template: '#supplement',
+
+	data: function data() {
+		return {
+			// 车牌号省份
+			carNoProvince: '粤',
+
+			// 车牌号码
+			plateNo: '', 
+
+			// 实例 (车牌选择) 
+			myCarKeyBoard: function () {}, 
+		}
+	},
+
+	mounted: function mounted() {
+        var _this = this;
+		
+		// 实例化 车牌选择
+		this.myCarKeyBoard = new CarKeyBoard({bindInputDom: 'ycpd-carplateid-input'});
+
+		// 绑定 车牌号码输入
+        this.myCarKeyBoard.succeedHandle(function (result) {
+            _this.plateNo = result;
+		});
+	},
+
+	methods: {
+		/**
+		 * 选择省份
+		 */
+		selectProvince: function selectProvince() {
+            var _this = this;
+
+            this.myCarKeyBoard.showProvincesKeyboard()
+            .then(function (value) {
+				_this.carNoProvince = value;
+            }, function (cancel) {
+				console.log('取消选择省份');
+            });
+		}
+	}
+}
+
 // 抽象的方法
 var utils = {
 	// 获取URL参数
@@ -173,22 +218,6 @@ var utils = {
 		return decodeURI(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURI(sVar).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
 	},
 };
-
-var VmSupplement = { // 完善车辆信息 Vue类
-	template: '#supplement',
-
-	data: function data() {
-		return {
-		}
-	},
-
-	mounted: function mounted() {
-	},
-
-	methods: {
-
-	}
-}
 
 // 抽象的方法
 var utils = {

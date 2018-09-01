@@ -133,3 +133,78 @@
         }
     }
 }
+
+// 车牌号页
+.supplement {
+    // 列表复用部分
+    .supplement-input-list {
+        padding-top: 10px;
+    
+        .input-list-content {
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            background: #fff;
+        }
+    
+        // 横线
+        .input-line {
+            margin-left: 15px;
+            height: 1px;
+            background: #ddd;
+        }
+    
+        // 项目复用
+        .input-item {
+            padding: 0px 15px;
+            height: 42px;
+            line-height: 42px;
+        }
+    
+        .input-item-title {
+            width: 80px;
+            font-size: 14px;
+            color: @black1;
+        }
+
+        .input-item-main {
+            color: @black2;
+            font-size: 14px;
+        }
+        
+        .item-rigth-input {
+            border: 0px;
+            outline: none;
+            line-height: 42px;
+            font-size: 14px;
+            color: @black2;
+        }
+
+        input:focus { 
+            outline: none;
+        }
+    }
+
+    // 车牌号
+    .supplement-carNo {
+        .input-item-select {
+            padding-right: 5px;
+            font-size: 14px;
+            line-height: 42px;
+            color: @black1;
+        }
+    
+        .item-rigth-icon {
+            padding-right: 5px;
+        }
+        
+        .ycpd-carplateid-input {
+            line-height: 42px;
+            font-size: 14px;
+            color: @black2;
+
+            .plateid-input-content {
+                letter-spacing: 4px;
+            }
+        }
+    }
+}
