@@ -98,6 +98,8 @@ var VmMain = { // 注册 Vue类
 			phoneValue: '',
 			// 验证号码
 			verifyNumber: '',
+			// 是否同意协议
+			isAgreement: false,
 		};
 	},
 

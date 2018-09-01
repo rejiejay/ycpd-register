@@ -38,19 +38,19 @@
             <!-- 注册 -->
             <div class="register-input">
                 <div class="register-content">
-                    <div class="register-inpu-item flex-start-center">
-                        <div class="inpu-item-lable">手机号码:</div>
-                        <div class="inpu-item-main flex-rest">
+                    <div class="register-input-item flex-start-center">
+                        <div class="input-item-lable">手机号码:</div>
+                        <div class="input-item-main flex-rest">
                             <input v-model="phoneValue" placeholder="请填写手机号码" />
                         </div>
                     </div>
-                    <div class="register-inpu-line"></div>
-                    <div class="register-inpu-item flex-start-center">
-                        <div class="inpu-item-lable">验证号码:</div>
-                        <div class="inpu-item-main flex-start-center flex-rest">
+                    <div class="register-input-line"></div>
+                    <div class="register-input-item flex-start-center">
+                        <div class="input-item-lable">验证号码:</div>
+                        <div class="input-item-main flex-start-center flex-rest">
                             <input v-model="verifyNumber" placeholder="输入6位手机验证码" />
                         </div>
-                        <div class="inpu-item-verify">
+                        <div class="input-item-verify">
                             <div class="item-verify-content">获取验证码</div>
                         </div>
                     </div>
@@ -59,6 +59,24 @@
 
             <!-- 协议 -->
             <div class="register-agreement">
+                <div class="register-agreement-content flex-start-center">
+                    <div class="agreement-radio-content">
+                    <div class="register-agreement-radio"
+                        :class="{'agreement-radio-selected' : isAgreement}"
+                        @click="isAgreement = !isAgreement"
+                    ></div>
+                    </div>
+                    
+                    <div class="register-agreement-text">
+                        我已阅读并同意<span>《养车频道用户协议》</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 提交 -->
+            <div class="register-submit">
+                <div class="register-submit-content">
+                </div>
             </div>
         </div>
     </div>

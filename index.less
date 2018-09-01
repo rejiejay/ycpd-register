@@ -23,10 +23,10 @@
             background-color: #fff;
             padding-left: 15px;
 
-            .register-inpu-item {
+            .register-input-item {
                 height: 45px;
     
-                .inpu-item-lable {
+                .input-item-lable {
                     color: @black1;
                     width: 70px;
                 }
@@ -51,7 +51,7 @@
         }
 
         // 获取验证码
-        .inpu-item-verify {
+        .input-item-verify {
             height: 30px;
             padding-right: 15px;
 
@@ -74,7 +74,7 @@
         }
 
         // 横线
-        .register-inpu-line {
+        .register-input-line {
             background-color: #ddd;
             height: 1px;
             width: 100%;
@@ -83,6 +83,40 @@
     
     // 协议
     .register-agreement {
-        
+        padding: 0px 15px;
+
+        .register-agreement-content {
+            height: 30px;
+        }
+
+        // 单选框
+        .agreement-radio-content {
+            width: 15px;
+
+            .register-agreement-radio {
+                width: 14px;
+                height: 14px;
+                border: 1px solid @black3;
+                border-radius: 14px;
+            }
+            // 单选框选中
+            .agreement-radio-selected {
+                width: 8px;
+                height: 8px;
+                border: 5px solid #409EFF;
+                border-radius: 14px;
+            }
+        }
+
+        // 协议文本
+        .register-agreement-text {
+            padding-left: 5px;
+            font-size: 12px;
+            color: @black3;
+
+            span {
+                color: #5594FF;
+            }
+        }
     }
 }
