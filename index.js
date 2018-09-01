@@ -34,19 +34,30 @@ var init = {
 		var routes = [
 			{
 				path: '/', // 注册
-				component: VmMain
+				component: VmMain,
+				meta: { title: '注册' },
 			}, { // 我的车辆列表
 				path: '/mycar',
-				component: VmMyCar
-			}, { // 
+				component: VmMyCar,
+				meta: { title: '我的车辆' },
+			}, { // 完善车辆信息
 				path: '/supplement',
-				component: VmSupplement
+				component: VmSupplement,
+				meta: { title: '完善车辆信息' },
 			}
 		];
 
 		// 初始化路由配置
 		var router = new VueRouter({
 			routes: routes
+		});
+		
+		router.beforeEach( function (to, from, next) { // 全局的 beforeEach 守卫
+			if (to.meta.title) { // 路由发生变化修改页面 title
+				document.title = to.meta.title;
+			}
+
+			next();
 		});
 
 		// 初始化 Vue 到页面
