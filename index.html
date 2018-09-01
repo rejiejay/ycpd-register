@@ -52,8 +52,9 @@
                         </div>
                         <div class="input-item-verify">
                             <div class="item-verify-content"
+                                :class="{'item-verify-disable' : isVerifyGeting}"
                                 @click="verifyNumberHandle"
-                            >获取验证码</div>
+                            >{{isVerifyGeting ? (countDown + '秒后获取') : '获取验证码'}}</div>
                         </div>
                     </div>
                 </div>
@@ -61,14 +62,16 @@
 
             <!-- 协议 -->
             <div class="register-agreement">
-                <div class="register-agreement-content flex-start-center">
-                    <div class="agreement-radio-content">
-                    <div class="register-agreement-radio"
-                        :class="{'agreement-radio-selected' : isAgreement}"
-                        @click="isAgreement = !isAgreement"
-                    ></div>
+                <div class="register-agreement-content flex-start-center" @click="isAgreement = !isAgreement">
+                    <div class="agreement-radio-content" 
+                        :class="[isAgreement ? 'agreement-radio-selected' : 'register-agreement-radio']"
+                    >
+                        <svg width="16" height="16" t="1535773287663" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2604" xmlns:xlink="http://www.w3.org/1999/xlink">
+                            <path d="M511.452 957.752c-246.502 0-447.037-200.535-447.037-447.027 0-246.497 200.535-447.037 447.037-447.037S958.49 264.228 958.49 510.725c0 246.492-200.535 447.027-447.038 447.027z m0-842.788c-218.224 0-395.766 177.542-395.766 395.766s177.542 395.75 395.766 395.75 395.766-177.525 395.766-395.75-177.541-395.766-395.766-395.766z" p-id="2605"></path>
+                            <path v-if="isAgreement" d="M438.477 684.841a25.605 25.605 0 0 1-18.125-7.516l-148.46-148.47a25.626 25.626 0 0 1 0-36.25 25.626 25.626 0 0 1 36.25 0l130.335 130.33 272.44-272.42a25.626 25.626 0 0 1 36.25 0 25.626 25.626 0 0 1 0 36.25L456.602 677.32a25.641 25.641 0 0 1-18.125 7.521z" p-id="2606"></path>
+                        </svg>
                     </div>
-                    
+
                     <div class="register-agreement-text">
                         我已阅读并同意<span>《养车频道用户协议》</span>
                     </div>

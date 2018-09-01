@@ -103,6 +103,8 @@ var VmMain = { // 注册 Vue类
 			verifyNumber: '',
 			// 是否 正在获取验证码
 			isVerifyGeting: false,
+			// 倒计时60秒
+			countDown: 60,
 			// 是否同意协议
 			isAgreement: false,
 		};
@@ -115,7 +117,24 @@ var VmMain = { // 注册 Vue类
 		 * 获取验证码
 		 */
 		verifyNumberHandle: function verifyNumberHandle() {
+			const _this = this;
 
+			// 判断是否正在获取验证码
+			if (this.isVerifyGeting === false) {
+				this.isVerifyGeting = true; // 表示正在获取
+				// 定时器倒计时 60 秒
+				for(var i = 0; i < 60; i++ ) {
+					(function (i) { // 匿名函数自执行创建闭包
+						setTimeout(function() {
+							_this.countDown--;
+							if (i === 59) {
+								_this.countDown = 60;
+								_this.isVerifyGeting = false;
+							}
+						}, i * 1000);
+					})(i);
+				}
+			}
 		}
 	},
 };
