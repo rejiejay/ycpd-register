@@ -162,15 +162,23 @@
             height: 42px;
             line-height: 42px;
         }
+
+        // 标题信号
+        .supplement-input-title {
+            padding-left: 15px;
+            height: 35px;
+            line-height: 35px;
+        }
     
         .input-item-title {
             width: 80px;
             font-size: 14px;
-            color: @black1;
+            line-height: 42px;
+            color: @black2;
         }
 
         .input-item-main {
-            color: @black2;
+            color: @black1;
             font-size: 14px;
         }
         
@@ -180,7 +188,7 @@
             outline: none;
             line-height: 42px;
             font-size: 14px;
-            color: @black2;
+            color: @black1;
         }
 
         input:focus { 
@@ -220,10 +228,7 @@
     .supplement-carType {
         // 标题信号
         .supplement-input-title {
-            padding-left: 15px;
-            height: 35px;
             font-size: 14px;
-            line-height: 35px;
             color: @black2;
         }
 
@@ -232,7 +237,7 @@
         }
     }
 
-    // 驾驶证
+    // 车辆型号 提示信息
     .dialog-tip {
         position: fixed;
         top: 0px;
@@ -272,4 +277,29 @@
         }
     }
     .dialog-tip-deny { display: none; }
+
+    // 品牌车系年份车型等
+    .series-year-model {
+
+        // 顶部提示
+        .supplement-input-title {
+            font-size: 12px;
+            color: #FF8D18;
+        }
+
+        // 主要部分
+        .input-item-main {
+            line-height: 42px;
+            height: 42px;
+        }
+
+        // 显示占位符
+        .item-show-placeholder {
+            color: @black3;
+        }
+
+        .input-item-icon {
+            height: 42px;
+        }
+    }
 }
