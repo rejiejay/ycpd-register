@@ -10,6 +10,7 @@
 @dialog-tip-content-z-index: 3;
 
 #app {
+    position: relative;
     width: 100%;
     min-height: 100%;
     background-color: #f5f5f5;
@@ -138,7 +139,61 @@
     }
 }
 
-// 车牌号页
+// 我的车辆信息
+.mycar {
+    
+    // 车辆信息列表
+    .mycar-list {
+        padding-top: 5px;
+        padding-bottom: 75px;
+
+        // 框架
+        .mycar-list-item {
+            padding-top: 5px;
+            font-size: 14px;
+            color: @black2;
+        
+            .list-item-content {
+                background: #fff;
+                padding: 15px;
+            }
+        }
+
+        .list-item-titile {
+            font-family: '微软雅黑';
+            padding-bottom: 2.5px;
+            color: @black1;
+        }
+
+        .list-item-lable {
+            color: @black3;
+        }
+
+    }
+
+    // 车辆信息 新增
+    .mycar-add {
+        position: fixed;
+        left: 0px;
+        bottom: 0px;
+        width: 100%;
+
+        .mycar-add-position {
+            padding: 15px;
+        }
+
+        .mycar-add-content {
+            border-radius: 4px;
+            height: 45px;
+            line-height: 45px;
+            text-align: center;
+            color: #fff;
+            background-color: #E50012;
+        }
+    }
+}
+
+// 完善车辆信息页
 .supplement {
     // 列表复用部分
     .supplement-input-list {

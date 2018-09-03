@@ -103,7 +103,11 @@ var ajaxs = {
 	},
 };
 
-var VmMain = { // 注册 Vue类
+/**
+ * Vue类
+ * 注册页面
+ */
+var VmMain = {
 	template: '#register',
 
 	data: function data() {
@@ -150,11 +154,27 @@ var VmMain = { // 注册 Vue类
 	},
 };
 
-var VmMyCar = { // 完善车辆信息 Vue类
+/**
+ * Vue类
+ * 我的车辆页面
+ */
+var VmMyCar = {
 	template: '#mycar',
 
 	data: function data() {
 		return {
+			// 车辆列表
+			carList: [
+				{
+					carNo: '粤B12345', // 车牌号
+					carType: '比亚迪-泰', // 车牌号
+					isDefault: true, // 是否默认
+				}, {
+					carNo: '粤B12345', // 车牌号
+					carType: '比亚迪-泰', // 车牌号
+					isDefault: false, // 是否默认
+				}
+			],
 		}
 	},
 
@@ -166,7 +186,11 @@ var VmMyCar = { // 完善车辆信息 Vue类
 	}
 }
 
-var VmSupplement = { // 完善车辆信息 Vue类
+/**
+ * Vue类
+ * 完善车辆信息页面
+ */
+var VmSupplement = {
 	template: '#supplement',
 
 	data: function data() {
@@ -219,14 +243,6 @@ var VmSupplement = { // 完善车辆信息 Vue类
 		}
 	}
 }
-
-// 抽象的方法
-var utils = {
-	// 获取URL参数
-	loadPageVar: function loadPageVar(sVar) {
-		return decodeURI(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURI(sVar).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
-	},
-};
 
 // 抽象的方法
 var utils = {
