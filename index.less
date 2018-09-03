@@ -5,6 +5,10 @@
 @black3: #909399;
 @black4: #C0C4CC;
 
+@dialog-tip-z-index: 1;
+@dialog-tip-shade-z-index: 2;
+@dialog-tip-content-z-index: 3;
+
 #app {
     width: 100%;
     min-height: 100%;
@@ -227,4 +231,45 @@
             height: 42px;
         }
     }
+
+    // 驾驶证
+    .dialog-tip {
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.46);
+        z-index: @dialog-tip-z-index;
+        
+        .dialog-tip-shade {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: @dialog-tip-shade-z-index;
+        }
+
+        .dialog-tip-content {
+            position: relative;
+            padding: 15px;
+            z-index: @dialog-tip-content-z-index;
+        
+            .dialog-tip-img {
+                width: 100%;
+                height: 100%;
+                background: #fff;
+                border-radius: 15px;
+                overflow: hidden;
+            }
+        
+            img {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+    .dialog-tip-deny { display: none; }
 }

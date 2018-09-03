@@ -180,7 +180,7 @@ var VmSupplement = { // 完善车辆信息 Vue类
 			// 实例 (车牌选择) 
 			myCarKeyBoard: function () {}, 
 
-			// 
+			// 驾驶证
 			dialogTip: false,
 		}
 	},
