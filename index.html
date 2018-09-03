@@ -36,195 +36,218 @@
 
 <body>
 
-    <div id="app">
-        <keep-alive>
-            <router-view></router-view>
-        </keep-alive>
-    </div>
+<div id="app">
+    <keep-alive>
+        <router-view></router-view>
+    </keep-alive>
+</div>
 
+<!-- 注册 -->
+<script type="text/template" id="register">
+<div class="register">
     <!-- 注册 -->
-    <script type="text/template" id="register">
-        <div class="register">
-            <!-- 注册 -->
-            <div class="register-input">
-                <div class="register-content">
-                    <div class="register-input-item flex-start-center">
-                        <div class="input-item-lable">手机号码:</div>
-                        <div class="input-item-main flex-rest">
-                            <input v-model="phoneValue" placeholder="请填写手机号码" />
-                        </div>
-                    </div>
-                    <div class="register-input-line"></div>
-                    <div class="register-input-item flex-start-center">
-                        <div class="input-item-lable">验证号码:</div>
-                        <div class="input-item-main flex-start-center flex-rest">
-                            <input v-model="verifyNumber" placeholder="输入6位手机验证码" />
-                        </div>
-                        <div class="input-item-verify">
-                            <div class="item-verify-content"
-                                :class="{'item-verify-disable' : isVerifyGeting}"
-                                @click="verifyNumberHandle"
-                            >{{isVerifyGeting ? (countDown + '秒后获取') : '获取验证码'}}</div>
-                        </div>
-                    </div>
+    <div class="register-input">
+        <div class="register-content">
+            <div class="register-input-item flex-start-center">
+                <div class="input-item-lable">手机号码:</div>
+                <div class="input-item-main flex-rest">
+                    <input v-model="phoneValue" placeholder="请填写手机号码" />
                 </div>
             </div>
+            <div class="register-input-line"></div>
+            <div class="register-input-item flex-start-center">
+                <div class="input-item-lable">验证号码:</div>
+                <div class="input-item-main flex-start-center flex-rest">
+                    <input v-model="verifyNumber" placeholder="输入6位手机验证码" />
+                </div>
+                <div class="input-item-verify">
+                    <div class="item-verify-content"
+                        :class="{'item-verify-disable' : isVerifyGeting}"
+                        @click="verifyNumberHandle"
+                    >{{isVerifyGeting ? (countDown + '秒后获取') : '获取验证码'}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            <!-- 协议 -->
-            <div class="register-agreement">
-                <div class="register-agreement-content flex-start-center" @click="isAgreement = !isAgreement">
-                    <div class="agreement-radio-content" 
-                        :class="[isAgreement ? 'agreement-radio-selected' : 'register-agreement-radio']"
-                    >
-                        <svg width="16" height="16" t="1535773287663" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2604" xmlns:xlink="http://www.w3.org/1999/xlink">
-                            <path d="M511.452 957.752c-246.502 0-447.037-200.535-447.037-447.027 0-246.497 200.535-447.037 447.037-447.037S958.49 264.228 958.49 510.725c0 246.492-200.535 447.027-447.038 447.027z m0-842.788c-218.224 0-395.766 177.542-395.766 395.766s177.542 395.75 395.766 395.75 395.766-177.525 395.766-395.75-177.541-395.766-395.766-395.766z" p-id="2605"></path>
-                            <path v-if="isAgreement" d="M438.477 684.841a25.605 25.605 0 0 1-18.125-7.516l-148.46-148.47a25.626 25.626 0 0 1 0-36.25 25.626 25.626 0 0 1 36.25 0l130.335 130.33 272.44-272.42a25.626 25.626 0 0 1 36.25 0 25.626 25.626 0 0 1 0 36.25L456.602 677.32a25.641 25.641 0 0 1-18.125 7.521z" p-id="2606"></path>
+    <!-- 协议 -->
+    <div class="register-agreement">
+        <div class="register-agreement-content flex-start-center" @click="isAgreement = !isAgreement">
+            <div class="agreement-radio-content" 
+                :class="[isAgreement ? 'agreement-radio-selected' : 'register-agreement-radio']"
+            >
+                <svg width="16" height="16" t="1535773287663" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2604" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <path d="M511.452 957.752c-246.502 0-447.037-200.535-447.037-447.027 0-246.497 200.535-447.037 447.037-447.037S958.49 264.228 958.49 510.725c0 246.492-200.535 447.027-447.038 447.027z m0-842.788c-218.224 0-395.766 177.542-395.766 395.766s177.542 395.75 395.766 395.75 395.766-177.525 395.766-395.75-177.541-395.766-395.766-395.766z" p-id="2605"></path>
+                    <path v-if="isAgreement" d="M438.477 684.841a25.605 25.605 0 0 1-18.125-7.516l-148.46-148.47a25.626 25.626 0 0 1 0-36.25 25.626 25.626 0 0 1 36.25 0l130.335 130.33 272.44-272.42a25.626 25.626 0 0 1 36.25 0 25.626 25.626 0 0 1 0 36.25L456.602 677.32a25.641 25.641 0 0 1-18.125 7.521z" p-id="2606"></path>
+                </svg>
+            </div>
+
+            <div class="register-agreement-text">
+                <!-- 详情参考 C:\Rejiejay\YCPD-ABY-SVN\UI\WeixinWeb\wx\selectmobile.aspx -->
+                我已阅读并同意<span>《养车频道用户服务协议》</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提交 -->
+    <div class="register-submit">
+        <div class="register-submit-content">确认</div>
+    </div>
+</div>
+</script>
+
+<!-- 我的车辆信息 -->
+<script type="text/template" id="mycar">
+<div class="mycar">
+</div>
+</script>
+
+<!-- 完善车辆信息 -->
+<script type="text/template" id="supplement">
+<div class="supplement">
+
+    <!-- 车牌号 -->
+    <div class="supplement-input-list supplement-carNo">
+        <div class="input-list-content">
+            <div class="input-item flex-start">
+                <div class="input-item-title">车牌号码:</div>
+                <div class="input-item-main flex-rest flex-start-center">
+                    <div class="input-item-select" @click="selectProvince">{{carNoProvince}}</div>
+                    <div class="item-rigth-icon flex-start-center">
+                        <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >
+                            <path fill="#909399" d="M325.399273 235.124364L600.157091 488.727273 325.399273 742.353455a34.909091 34.909091 0 1 0 47.36 51.316363l302.545454-279.272727a34.909091 34.909091 0 0 0 0-51.316364l-302.545454-279.272727a34.909091 34.909091 0 1 0-47.36 51.316364" p-id="1465"></path>
                         </svg>
                     </div>
-
-                    <div class="register-agreement-text">
-                        <!-- 详情参考 C:\Rejiejay\YCPD-ABY-SVN\UI\WeixinWeb\wx\selectmobile.aspx -->
-                        我已阅读并同意<span>《养车频道用户服务协议》</span>
-                    </div>
+                    <div id="ycpd-carplateid-input" class="flex-rest"></div>
                 </div>
-            </div>
-
-            <!-- 提交 -->
-            <div class="register-submit">
-                <div class="register-submit-content">确认</div>
             </div>
         </div>
     </div>
-    </script>
+
+    <!-- 车辆型号 -->
+    <div class="supplement-input-list supplement-carType">
+        <div class="supplement-input-title">车辆型号</div>
+        <div class="input-list-content">
+            <div class="input-item flex-start">
+                <div class="input-item-title">车架号码:</div>
+                <div class="input-item-main flex-rest flex-start-center">
+                    <input class="item-rigth-input" placeholder="请输入车架号码" />
+                </div>
+                <div class="input-item-tip flex-start-center" @click="dialogTip = true;">
+                    <svg t="1530501234558" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2537" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                        width="20" height="20">
+                        <path d="M510.827291 64.041572c247.095701 0.027629 448.76684 201.816448 448.279746 448.541713-0.490164 247.641123-201.838961 448.843588-448.570365 448.240861-247.462045-0.603751-447.696462-200.955848-448.02392-448.288956C62.184271 265.653359 263.742846 64.013943 510.827291 64.041572zM916.774907 512.36532C916.739091 288.773939 735.657896 107.047038 511.049349 106.58655c-223.89121-0.458441-405.925103 181.25311-406.15944 405.79105-0.233314 223.61287 181.448562 405.16581 405.673369 405.804353C733.898833 918.818449 916.810722 736.084615 916.774907 512.36532zM535.794939 657.30027c-19.142989 0-37.775348 0-56.938803 0 0-11.373025-0.607844-22.537296 0.127913-33.612539 1.484817-22.364357 6.65763-43.814901 18.343787-63.300698 9.094122-15.164375 20.674878-28.250414 33.540907-40.276309 15.978926-14.935154 32.148188-29.677926 47.809889-44.939515 9.222035-8.985652 17.418718-19.008936 21.679765-31.483038 10.207479-29.883611 3.681856-56.56939-16.198937-80.3367-33.015951-39.469943-88.2356-40.821731-122.050754-21.066805-21.313422 12.450567-34.092469 31.502481-41.552371 54.414307-3.344165 10.271948-5.653767 20.880563-8.651031 32.155351-19.651572-2.333138-39.766702-4.721535-60.636009-7.198959 0.778736-5.205559 1.336438-10.100032 2.26253-14.923898 5.196349-27.060309 14.589276-52.297087 32.253588-73.943083 21.519106-26.369577 49.554626-41.723264 82.579787-48.061622 34.471093-6.615675 68.919672-5.901407 102.44216 4.986571 42.920532 13.939477 74.679863 41.176818 89.112574 84.563978 13.856589 41.654702 7.048533 81.003895-20.22667 116.155487-17.302061 22.298865-38.820144 40.415478-59.041698 59.83169-8.895601 8.541537-17.895579 17.136286-25.622564 26.696012-11.477402 14.198374-15.858176 31.370475-17.241686 49.325405C537.00551 636.422777 536.474414 646.580115 535.794939 657.30027zM475.157907 777.74034c0-22.494317 0-44.771693 0-67.411319 22.538319 0 44.810578 0 67.458391 0 0 22.425755 0 44.709271 0 67.411319C520.208962 777.74034 497.807766 777.74034 475.157907 777.74034z" p-id="2538" 
+                            fill="#26a2ff">
+                    </path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    <!-- 我的车辆信息 -->
-    <script type="text/template" id="mycar">
-        <div class="mycar">
+    <!-- 车辆型号 提示信息 -->
+    <div class="dialog-tip flex-center" v-bind:class="{'dialog-tip-deny' : (dialogTip === false)}">
+        <div 
+            class="dialog-tip-shade"
+            @click="dialogTip = false;"
+        ></div>
+
+        <div class="dialog-tip-content">
+            <div class="dialog-tip-img">
+                <img alt="驾驶证" src="https://ycpd-assets.oss-cn-shenzhen.aliyuncs.com/ycpd/business/icon/drivinglicence.png">
+            </div>
         </div>
-    </script>
+    </div>
 
-    <!-- 完善车辆信息 -->
-    <script type="text/template" id="supplement">
-        <div class="supplement">
-
-            <!-- 车牌号 -->
-            <div class="supplement-input-list supplement-carNo">
-                <div class="input-list-content">
-                    <div class="input-item flex-start">
-                        <div class="input-item-title">车牌号码:</div>
-                        <div class="input-item-main flex-rest flex-start-center">
-                            <div class="input-item-select" @click="selectProvince">{{carNoProvince}}</div>
-                            <div class="item-rigth-icon flex-start-center">
-                                <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >
-                                    <path fill="#909399" d="M325.399273 235.124364L600.157091 488.727273 325.399273 742.353455a34.909091 34.909091 0 1 0 47.36 51.316363l302.545454-279.272727a34.909091 34.909091 0 0 0 0-51.316364l-302.545454-279.272727a34.909091 34.909091 0 1 0-47.36 51.316364" p-id="1465"></path>
-                                </svg>
-                            </div>
-                            <div id="ycpd-carplateid-input" class="flex-rest"></div>
-                        </div>
-                    </div>
+    <!-- 品牌车系年份车型等 -->
+    <div class="supplement-input-list series-year-model">
+        <div class="supplement-input-title">输入车架号可为您自动解析车辆型号</div>
+        <div class="input-list-content">
+            <div class="input-item flex-start">
+                <div class="input-item-title">品&ensp;&ensp;&ensp;&ensp;牌:</div>
+                <div class="input-item-main flex-rest"
+                    v-bind:class="{'item-show-placeholder' : !false}"
+                >
+                    请选择车辆品牌
+                </div>
+                <div class="input-item-icon flex-start-center">
+                    <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >
+                        <path fill="#C0C4CC" d="M325.399273 235.124364L600.157091 488.727273 325.399273 742.353455a34.909091 34.909091 0 1 0 47.36 51.316363l302.545454-279.272727a34.909091 34.909091 0 0 0 0-51.316364l-302.545454-279.272727a34.909091 34.909091 0 1 0-47.36 51.316364" p-id="1465"></path>
+                    </svg>
                 </div>
             </div>
-
-            <!-- 车辆型号 -->
-            <div class="supplement-input-list supplement-carType">
-                <div class="supplement-input-title">车辆型号</div>
-                <div class="input-list-content">
-                    <div class="input-item flex-start">
-                        <div class="input-item-title">车架号码:</div>
-                        <div class="input-item-main flex-rest flex-start-center">
-                            <input class="item-rigth-input" placeholder="请输入车架号码" />
-                        </div>
-                        <div class="input-item-tip flex-start-center" @click="dialogTip = true;">
-                            <svg t="1530501234558" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2537" xmlns:xlink="http://www.w3.org/1999/xlink" 
-                                width="20" height="20">
-                                <path d="M510.827291 64.041572c247.095701 0.027629 448.76684 201.816448 448.279746 448.541713-0.490164 247.641123-201.838961 448.843588-448.570365 448.240861-247.462045-0.603751-447.696462-200.955848-448.02392-448.288956C62.184271 265.653359 263.742846 64.013943 510.827291 64.041572zM916.774907 512.36532C916.739091 288.773939 735.657896 107.047038 511.049349 106.58655c-223.89121-0.458441-405.925103 181.25311-406.15944 405.79105-0.233314 223.61287 181.448562 405.16581 405.673369 405.804353C733.898833 918.818449 916.810722 736.084615 916.774907 512.36532zM535.794939 657.30027c-19.142989 0-37.775348 0-56.938803 0 0-11.373025-0.607844-22.537296 0.127913-33.612539 1.484817-22.364357 6.65763-43.814901 18.343787-63.300698 9.094122-15.164375 20.674878-28.250414 33.540907-40.276309 15.978926-14.935154 32.148188-29.677926 47.809889-44.939515 9.222035-8.985652 17.418718-19.008936 21.679765-31.483038 10.207479-29.883611 3.681856-56.56939-16.198937-80.3367-33.015951-39.469943-88.2356-40.821731-122.050754-21.066805-21.313422 12.450567-34.092469 31.502481-41.552371 54.414307-3.344165 10.271948-5.653767 20.880563-8.651031 32.155351-19.651572-2.333138-39.766702-4.721535-60.636009-7.198959 0.778736-5.205559 1.336438-10.100032 2.26253-14.923898 5.196349-27.060309 14.589276-52.297087 32.253588-73.943083 21.519106-26.369577 49.554626-41.723264 82.579787-48.061622 34.471093-6.615675 68.919672-5.901407 102.44216 4.986571 42.920532 13.939477 74.679863 41.176818 89.112574 84.563978 13.856589 41.654702 7.048533 81.003895-20.22667 116.155487-17.302061 22.298865-38.820144 40.415478-59.041698 59.83169-8.895601 8.541537-17.895579 17.136286-25.622564 26.696012-11.477402 14.198374-15.858176 31.370475-17.241686 49.325405C537.00551 636.422777 536.474414 646.580115 535.794939 657.30027zM475.157907 777.74034c0-22.494317 0-44.771693 0-67.411319 22.538319 0 44.810578 0 67.458391 0 0 22.425755 0 44.709271 0 67.411319C520.208962 777.74034 497.807766 777.74034 475.157907 777.74034z" p-id="2538" 
-                                    fill="#26a2ff">
-                            </path>
-                            </svg>
-                        </div>
-                    </div>
+            <div class="input-line"></div>
+            <div class="input-item flex-start">
+                <div class="input-item-title">车&ensp;&ensp;&ensp;&ensp;系:</div>
+                <div class="input-item-main flex-rest"
+                    v-bind:class="{'item-show-placeholder' : !false}"
+                >
+                    请选择车辆车系
+                </div>
+                <div class="input-item-icon flex-start-center">
+                    <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >
+                        <path fill="#C0C4CC" d="M325.399273 235.124364L600.157091 488.727273 325.399273 742.353455a34.909091 34.909091 0 1 0 47.36 51.316363l302.545454-279.272727a34.909091 34.909091 0 0 0 0-51.316364l-302.545454-279.272727a34.909091 34.909091 0 1 0-47.36 51.316364" p-id="1465"></path>
+                    </svg>
                 </div>
             </div>
-            
-            <!-- 车辆型号 提示信息 -->
-            <div class="dialog-tip flex-center" v-bind:class="{'dialog-tip-deny' : (dialogTip === false)}">
-                <div 
-                    class="dialog-tip-shade"
-                    @click="dialogTip = false;"
-                ></div>
-
-                <div class="dialog-tip-content">
-                    <div class="dialog-tip-img">
-                        <img alt="驾驶证" src="https://ycpd-assets.oss-cn-shenzhen.aliyuncs.com/ycpd/business/icon/drivinglicence.png">
-                    </div>
+            <div class="input-line"></div>
+            <div class="input-item flex-start">
+                <div class="input-item-title">年&ensp;&ensp;&ensp;&ensp;份:</div>
+                <div class="input-item-main flex-rest"
+                    v-bind:class="{'item-show-placeholder' : !false}"
+                >
+                    请选择车辆年份
+                </div>
+                <div class="input-item-icon flex-start-center">
+                    <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >
+                        <path fill="#C0C4CC" d="M325.399273 235.124364L600.157091 488.727273 325.399273 742.353455a34.909091 34.909091 0 1 0 47.36 51.316363l302.545454-279.272727a34.909091 34.909091 0 0 0 0-51.316364l-302.545454-279.272727a34.909091 34.909091 0 1 0-47.36 51.316364" p-id="1465"></path>
+                    </svg>
                 </div>
             </div>
-
-            <!-- 品牌车系年份车型等 -->
-            <div class="supplement-input-list series-year-model">
-                <div class="supplement-input-title">输入车架号可为您自动解析车辆型号</div>
-                <div class="input-list-content">
-                    <div class="input-item flex-start">
-                        <div class="input-item-title">品&ensp;&ensp;&ensp;&ensp;牌:</div>
-                        <div class="input-item-main flex-rest"
-                            v-bind:class="{'item-show-placeholder' : !false}"
-                        >
-                            请选择车辆品牌
-                        </div>
-                        <div class="input-item-icon flex-start-center">
-                            <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >
-                                <path fill="#C0C4CC" d="M325.399273 235.124364L600.157091 488.727273 325.399273 742.353455a34.909091 34.909091 0 1 0 47.36 51.316363l302.545454-279.272727a34.909091 34.909091 0 0 0 0-51.316364l-302.545454-279.272727a34.909091 34.909091 0 1 0-47.36 51.316364" p-id="1465"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="input-line"></div>
-                    <div class="input-item flex-start">
-                        <div class="input-item-title">车&ensp;&ensp;&ensp;&ensp;系:</div>
-                        <div class="input-item-main flex-rest"
-                            v-bind:class="{'item-show-placeholder' : !false}"
-                        >
-                            请选择车辆车系
-                        </div>
-                        <div class="input-item-icon flex-start-center">
-                            <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >
-                                <path fill="#C0C4CC" d="M325.399273 235.124364L600.157091 488.727273 325.399273 742.353455a34.909091 34.909091 0 1 0 47.36 51.316363l302.545454-279.272727a34.909091 34.909091 0 0 0 0-51.316364l-302.545454-279.272727a34.909091 34.909091 0 1 0-47.36 51.316364" p-id="1465"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="input-line"></div>
-                    <div class="input-item flex-start">
-                        <div class="input-item-title">年&ensp;&ensp;&ensp;&ensp;份:</div>
-                        <div class="input-item-main flex-rest"
-                            v-bind:class="{'item-show-placeholder' : !false}"
-                        >
-                            请选择车辆年份
-                        </div>
-                        <div class="input-item-icon flex-start-center">
-                            <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >
-                                <path fill="#C0C4CC" d="M325.399273 235.124364L600.157091 488.727273 325.399273 742.353455a34.909091 34.909091 0 1 0 47.36 51.316363l302.545454-279.272727a34.909091 34.909091 0 0 0 0-51.316364l-302.545454-279.272727a34.909091 34.909091 0 1 0-47.36 51.316364" p-id="1465"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="input-line"></div>
-                    <div class="input-item flex-start">
-                        <div class="input-item-title">车&ensp;&ensp;&ensp;&ensp;型:</div>
-                        <div class="input-item-main flex-rest"
-                            v-bind:class="{'item-show-placeholder' : !false}"
-                        >
-                            请选择车辆车型
-                        </div>
-                        <div class="input-item-icon flex-start-center">
-                            <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >
-                                <path fill="#C0C4CC" d="M325.399273 235.124364L600.157091 488.727273 325.399273 742.353455a34.909091 34.909091 0 1 0 47.36 51.316363l302.545454-279.272727a34.909091 34.909091 0 0 0 0-51.316364l-302.545454-279.272727a34.909091 34.909091 0 1 0-47.36 51.316364" p-id="1465"></path>
-                            </svg>
-                        </div>
-                    </div>
+            <div class="input-line"></div>
+            <div class="input-item flex-start">
+                <div class="input-item-title">车&ensp;&ensp;&ensp;&ensp;型:</div>
+                <div class="input-item-main flex-rest"
+                    v-bind:class="{'item-show-placeholder' : !false}"
+                >
+                    请选择车辆车型
+                </div>
+                <div class="input-item-icon flex-start-center">
+                    <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >
+                        <path fill="#C0C4CC" d="M325.399273 235.124364L600.157091 488.727273 325.399273 742.353455a34.909091 34.909091 0 1 0 47.36 51.316363l302.545454-279.272727a34.909091 34.909091 0 0 0 0-51.316364l-302.545454-279.272727a34.909091 34.909091 0 1 0-47.36 51.316364" p-id="1465"></path>
+                    </svg>
                 </div>
             </div>
         </div>
-    </script>
+    </div>
 
-    <script type="text/javascript" src="./index.js"></script>
+    <!-- 是否为默认车辆 -->
+    <div class="is-setting-default">
+        <div class="setting-default-content flex-start-center">
+            <div class="setting-default-main flex-rest">是否设为默认车辆</div>
+            <div class="setting-default-switch">
+                <label for="switch-cp" class="weui-switch-cp">
+                    <input id="switch-cp" ref="settingDefault" class="weui-switch-cp__input" type="checkbox">
+                    <div class="weui-switch-cp__box"></div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- 确认 -->
+    <div class="submit-button submit-affirm">
+        <div class="submit-button-content">确认</div>
+    </div>
+
+    <!-- 暂不添加  -->
+    <!-- 如果是注册流程, 则渲染这个按钮 -->
+    <div class="submit-button submit-cancel" v-if="isRegister" >
+        <div class="submit-button-content">暂不添加</div>
+    </div>
+</div>
+</script>
+
+<script type="text/javascript" src="./index.js"></script>
 </body>
 
 </html>

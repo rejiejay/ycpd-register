@@ -41,7 +41,7 @@ var init = {
 				component: VmMyCar,
 				meta: { title: '我的车辆' },
 			}, { // 完善车辆信息
-				path: '/supplement',
+				path: '/supplement/:isRegister',
 				component: VmSupplement,
 				meta: { title: '完善车辆信息' },
 			}
@@ -171,6 +171,9 @@ var VmSupplement = { // 完善车辆信息 Vue类
 
 	data: function data() {
 		return {
+			// 是否属于注册流程
+			isRegister: false,
+
 			// 车牌号省份
 			carNoProvince: '粤',
 
@@ -186,7 +189,10 @@ var VmSupplement = { // 完善车辆信息 Vue类
 	},
 
 	mounted: function mounted() {
-        var _this = this;
+		var _this = this;
+		
+		// 是否属于注册流程
+		this.isRegister = this.$route.params.isRegister === 'register' ? true : false;
 		
 		// 实例化 车牌选择
 		this.myCarKeyBoard = new CarKeyBoard({bindInputDom: 'ycpd-carplateid-input'});

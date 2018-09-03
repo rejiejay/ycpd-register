@@ -302,4 +302,146 @@
             height: 42px;
         }
     }
+
+    // 是否为默认车辆
+    .is-setting-default {
+        padding-top: 10px;
+
+        // 整体框架部分
+        .setting-default-content {
+            padding: 0px 15px;
+            height: 45px;
+            line-height: 45px;
+            font-size: 14px;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            background-color: #fff;
+        }
+
+        // 主要文字部分
+        .setting-default-main {
+            color: @black2;
+        }
+
+        // 整体框架部分
+        .setting-default-switch {
+
+        }
+        
+        // 选择按钮部分
+        .weui-switch,
+        .weui-switch-cp__box{
+            position:relative;
+            width:52px;
+            height:24px;
+            border:1px solid #DFDFDF;
+            outline:0;
+            border-radius:16px;
+            box-sizing:border-box;
+            background-color:#DFDFDF;
+            -webkit-transition:background-color 0.1s, border 0.1s;
+            transition:background-color 0.1s, border 0.1s;
+        }
+        .weui-switch:before,
+        .weui-switch-cp__box:before{
+            content:" ";
+            position:absolute;
+            top:0;
+            left:0;
+            width:50px;
+            height:30px;
+            border-radius:15px;
+            background-color:#FDFDFD;
+            -webkit-transition:-webkit-transform 0.35s cubic-bezier(0.45, 1, 0.4, 1);
+            transition:-webkit-transform 0.35s cubic-bezier(0.45, 1, 0.4, 1);
+            transition:transform 0.35s cubic-bezier(0.45, 1, 0.4, 1);
+            transition:transform 0.35s cubic-bezier(0.45, 1, 0.4, 1), -webkit-transform 0.35s cubic-bezier(0.45, 1, 0.4, 1);
+        }
+        .weui-switch:after,
+        .weui-switch-cp__box:after{
+            content:" ";
+            position:absolute;
+            top:0;
+            left:0;
+            width:22px;
+            height:22px;
+            border-radius:15px;
+            background-color:#FFFFFF;
+            box-shadow:0 1px 3px rgba(0, 0, 0, 0.4);
+            -webkit-transition:-webkit-transform 0.35s cubic-bezier(0.4, 0.4, 0.25, 1.35);
+            transition:-webkit-transform 0.35s cubic-bezier(0.4, 0.4, 0.25, 1.35);
+            transition:transform 0.35s cubic-bezier(0.4, 0.4, 0.25, 1.35);
+            transition:transform 0.35s cubic-bezier(0.4, 0.4, 0.25, 1.35), -webkit-transform 0.35s cubic-bezier(0.4, 0.4, 0.25, 1.35);
+        }
+        .weui-switch:checked,
+        .weui-switch-cp__input:checked ~ .weui-switch-cp__box{
+            border-color:#04BE02;
+            background-color:#04BE02;
+        }
+        .weui-switch:checked:before,
+        .weui-switch-cp__input:checked ~ .weui-switch-cp__box:before{
+            -webkit-transform:scale(0);
+            transform:scale(0);
+        }
+        .weui-switch:checked:after,
+        .weui-switch-cp__input:checked ~ .weui-switch-cp__box:after{
+            -webkit-transform:translateX(28px);
+            transform:translateX(28px);
+        }
+        .weui-switch-cp__input{
+            position:absolute;
+            left:-9999px;
+        }
+        .weui-switch-cp__box{
+            display:block;
+        }
+
+        @keyframes blink {
+            0% {
+                background-color: white;
+            }
+            
+            50% {
+                background-color: @black2;
+            }
+
+            100% {
+                background-color: white;
+            }
+        }
+    }
+
+    // 底部按钮复用部分
+    .submit-button {
+        padding-left: 15px;
+        padding-right: 15px;
+
+        .submit-button-content {
+            border-radius: 4px;
+            height: 45px;
+            line-height: 45px;
+            text-align: center;
+        }
+    }
+
+    // 确认
+    .submit-affirm {
+        padding-top: 20px;
+
+        .submit-button-content {
+            color: #fff;
+            background-color: #E50012;
+        }
+    }
+    
+    // 暂不添加
+    .submit-cancel {
+        padding-top: 12px;
+
+        .submit-button-content {
+            background: #fff;
+            color: @black3;
+            border: 1px solid #ddd;
+        }
+    }
 }
