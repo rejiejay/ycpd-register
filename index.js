@@ -36,6 +36,10 @@ var init = {
 				path: '/', // 注册
 				component: VmMain,
 				meta: { title: '注册' },
+			},{
+				path: '/agreement', // 用户协议页
+				component: VmAgreement,
+				meta: { title: '养车频道用户服务协议' },
 			}, { // 我的车辆列表
 				path: '/mycar',
 				component: VmMyCar,
@@ -172,6 +176,25 @@ var VmMain = {
 
 /**
  * Vue类
+ * 养车频道用户服务协议
+ */
+var VmAgreement = {
+	template: '#agreement',
+
+	data: function data() {
+		return {
+		}
+	},
+
+	mounted: function mounted() {
+	},
+
+	methods: {
+	}
+}
+
+/**
+ * Vue类
  * 我的车辆页面
  */
 var VmMyCar = {
@@ -250,7 +273,7 @@ var VmSupplement = {
 		
 		// 页面状态
 		this.pageType = this.$route.params.pageType;
-		
+
 		// 实例化 车牌选择
 		this.myCarKeyBoard = new CarKeyBoard({bindInputDom: 'ycpd-carplateid-input'});
 
