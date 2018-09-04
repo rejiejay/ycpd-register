@@ -398,12 +398,15 @@
     <div class="supplement-input-list series-year-model">
         <div class="supplement-input-title">输入车架号可为您自动解析车辆型号</div>
         <div class="input-list-content">
-            <div class="input-item flex-start">
+
+            <div class="input-item flex-start"
+                @click="brandModalVisible = true;"
+            >
                 <div class="input-item-title">品&ensp;&ensp;&ensp;&ensp;牌:</div>
                 <div class="input-item-main flex-rest"
-                    v-bind:class="{'item-show-placeholder' : !false}"
+                    v-bind:class="{'item-show-placeholder' : (carBrand === '')}"
                 >
-                    请选择车辆品牌
+                    {{ carBrand === '' ? '请选择车辆品牌' : carBrand}}
                 </div>
                 <div class="input-item-icon flex-start-center">
                     <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >
@@ -412,6 +415,7 @@
                 </div>
             </div>
             <div class="input-line"></div>
+            
             <div class="input-item flex-start">
                 <div class="input-item-title">车&ensp;&ensp;&ensp;&ensp;系:</div>
                 <div class="input-item-main flex-rest"
@@ -426,6 +430,7 @@
                 </div>
             </div>
             <div class="input-line"></div>
+            
             <div class="input-item flex-start">
                 <div class="input-item-title">年&ensp;&ensp;&ensp;&ensp;份:</div>
                 <div class="input-item-main flex-rest"
@@ -440,6 +445,7 @@
                 </div>
             </div>
             <div class="input-line"></div>
+            
             <div class="input-item flex-start">
                 <div class="input-item-title">车&ensp;&ensp;&ensp;&ensp;型:</div>
                 <div class="input-item-main flex-rest"
@@ -457,22 +463,28 @@
     </div>
 
     <!-- 择车辆品牌模态框 -->
-    <div class="car-brand-modal" >
+    <div class="car-brand-modal" v-if="brandModalVisible">
         <!-- 头部 -->
         <mt-header title="择车辆品牌">
-            <div slot="left"><i class="mintui mintui-back"></i></div>
+            <div slot="left" @click="brandModalVisible = false;"><i class="mintui mintui-back"></i></div>
         </mt-header>
 
         <!-- 选择列表 -->
-        <div class="brand-modal-group">
-            <div class="modal-group-title">A</div>
+        <div class="brand-modal-group"
+            v-for="(group, groupKey) in brandGroup" 
+            :key="groupKey"
+        >
+            <div class="modal-group-title">{{group.title}}</div>
 
             <div class="modal-group-list">
                 <div class="group-list-content">
                     <div class="modal-group-item flex-start-center"
-                        v-bind:class="{'item-bottom-line' : true}"
+                        v-for="(item, key) in group.list" 
+                        :key="key"
+                        v-bind:class="{'item-bottom-line' : ((key + 1) !== group.list.length)}"
+                        @click="selectCarBrand(item)"
                     >
-                        <div class="group-item-main flex-rest">阿尔冰娜</div>
+                        <div class="group-item-main flex-rest">{{item}}</div>
 
                         <div class="group-item-icon flex-center">
                             <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >

@@ -8,13 +8,15 @@ var config = (function () { // 匿名函数自执行
 	if (window.location.origin === 'file://' || window.location.host === 'store.demo.ichebaoyang.com') {
 		// 测试环境
 		return {
-
+			origin: 'http://store.demo.ichebaoyang.com',
+			getBrandHandler: 'http://store.demo.ichebaoyang.com/wx/Handler.ashx',
 		}
 
 	} else {
 		// 线上生产环境
 		return {
-
+			origin: 'http://ycpdapi.hotgz.com',
+			getBrandHandler: '/wx/Handler.ashx',
 		}
 	}
 })();
@@ -81,35 +83,54 @@ var init = {
 // ajaxs请求类
 var ajaxs = {
     /**
-     * 测试请求
-     * @param {string} pageNo 分页
+     * 获取 车辆品牌 列表
      */
-	test: function test() {
-		var _this = this;
-
-		// var result = { // 测试数据
-		// 	"message": "请求成功",
-		// };
-
-		Vue.prototype.$indicator.open('正在加载数据...');
+	getBrandHandler: function getBrandHandler() {
 		return new Promise(function (resolve, reject) {
-
-			// resolve(result.stores); // 返回测试数据
-
-			$.get("/api/storeCarWash")
-				.done(function (data) {
-					Vue.prototype.$indicator.close();
-					if (data && data.code == 200) {
-						resolve(data.stores);
+			var form = new FormData();
+			form.append("action", "GetBrand");
+			
+			$.ajax({
+				url: config.getBrandHandler,
+				type: "POST",
+                data: form,
+                processData: false,
+                contentType: false,
+				success: function(res){
+					if (res && res instanceof Array && res.length > 0) {
+						resolve(res);
 					} else {
-						reject('向服务器发起请求成功，但是查找所有获取门店列表数据有误, 原因: ' + JSON.stringify(data));
+						reject('向服务器发起请求查找车辆品牌列表成功, 但是服务器数据有误!');
 					}
-				}).fail(function (data) {
-					Vue.prototype.$indicator.close();
-					reject('向服务器发起请求查找所有获取门店列表失败, 原因: ' + JSON.stringify(data));
-				});
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					reject('向服务器发起请求查找车辆品牌列表失败, 原因: ' + errorThrown);
+				}
+			});
 		});
 	},
+
+    // /**
+    //  * 获取 车辆品牌 列表
+    //  */
+	// getBrandHandler: function getBrandHandler() {
+
+	// 	Vue.prototype.$indicator.open('正在加载数据...');
+	// 	return new Promise(function (resolve, reject) {
+	// 		$.ajax({
+	// 			url: config.getBrandHandler,
+	// 			type: "GET",
+	// 			success: function(res){
+	// 				Vue.prototype.$indicator.close();
+	// 				console.log(res)
+	// 			},
+	// 			error: function (XMLHttpRequest, textStatus, errorThrown) {
+	// 				Vue.prototype.$indicator.close();
+	// 				reject('向服务器发起请求查找车辆品牌列表失败, 原因: ' + errorThrown);
+	// 			}
+	// 		});
+	// 	});
+	// },
 };
 
 /**
@@ -265,15 +286,31 @@ var VmSupplement = {
 			// 实例 (车牌选择) 
 			myCarKeyBoard: function () {}, 
 
-			// 驾驶证
+			// 驾驶证 提示信息
 			dialogTip: false,
+
+			// 择车辆品牌模态框
+			brandModalVisible: false,
+
+			// 择车辆品牌 列表
+			brandGroup: [
+				// {
+				// 	title: 'A',
+				// 	list: [
+				// 		'阿尔冰娜'
+				// 	],
+				// }
+			],
+
+			// 选择中的车辆品牌
+			carBrand: '',
 		}
 	},
 
 	mounted: function mounted() {
 		var _this = this;
 		
-		// 页面状态
+		// 页面状态 初始化
 		this.pageType = this.$route.params.pageType;
 
 		// 实例化 车牌选择
@@ -283,11 +320,32 @@ var VmSupplement = {
         this.myCarKeyBoard.succeedHandle(function (result) {
             _this.plateNo = result;
 		});
+
+		// 初始化 车辆品牌 列表
+		this.initCarBrand();
 	},
 
 	methods: {
 		/**
-		 * 选择省份
+		 * 初始化 车辆品牌 列表
+		 */
+		initCarBrand: function initCarBrand() {
+            var _this = this;
+			ajaxs.getBrandHandler()
+			.then(function (brandGroup) {
+				_this.brandGroup = brandGroup.map(function (brand) {
+					return {
+						title: brand.Group,
+						list: brand.Brands.split(','),
+					}
+				});
+			}, function (error) {
+				alert(error);
+			});
+		},
+
+		/**
+		 * 选择车牌省份
 		 */
 		selectProvince: function selectProvince() {
             var _this = this;
@@ -298,6 +356,14 @@ var VmSupplement = {
             }, function (cancel) {
 				console.log('取消选择省份');
             });
+		},
+
+		/**
+		 * 选择 车辆品牌
+		 */
+		selectCarBrand: function selectCarBrand(item) {
+			this.brandModalVisible = false; // 模态框
+			this.carBrand = item;
 		}
 	}
 }
