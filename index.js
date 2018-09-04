@@ -166,6 +166,13 @@ var VmMain = {
 		},
 
 		/**
+		 * 跳转到 养车频道用户服务协议
+		 */
+		jumpToAgreement: function jumpToAgreement() {
+			this.$router.push({ path: '/agreement' });
+		},
+
+		/**
 		 * 获取验证码
 		 */
 		submitRegister: function submitRegister() {
@@ -181,16 +188,11 @@ var VmMain = {
 var VmAgreement = {
 	template: '#agreement',
 
-	data: function data() {
-		return {
-		}
-	},
+	data: function data() { return {} },
 
-	mounted: function mounted() {
-	},
+	mounted: function mounted() { },
 
-	methods: {
-	}
+	methods: { }
 }
 
 /**
