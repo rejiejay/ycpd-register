@@ -326,7 +326,7 @@ var VmSupplement = {
 			 * 车系
 			 */ 
 			carSeries: '', // 选择中的车系
-			seriesList: [ // 选择中的车系列表
+			seriesList: [ // 选择中的车系
 				// 'X6'
 			],
 		}
@@ -397,32 +397,10 @@ var VmSupplement = {
 			.then(function (series) {
 				_this.seriesList = series.map(function (item) {
 					return item.brandSeriesName
-				});
+				})
 			}, function (error) {
 				alert(error);
 			});
-		},
-
-		/**
-		 * 品牌车系年份车型 提示 选择顺序
-		 */
-		selectTip: function selectTip() {
-			if (this.carSeries === '') {
-				// 先判断 是否选择中的车辆品牌
-				alert('请先选择车辆品牌');
-			} else if (this.carBrand === '') {
-				// 判断 是否选择中的车辆车系
-				alert('请先选择车系');
-			}
-		}
-	},
-
-	watch: {
-		/**
-		 * 监听选择中的车系
-		 */
-		carSeries: function (newCarSeries, oldCarSeries) {
-
 		},
 	}
 }
