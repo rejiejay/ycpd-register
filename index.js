@@ -40,8 +40,13 @@ var init = {
 				path: '/mycar',
 				component: VmMyCar,
 				meta: { title: '我的车辆' },
-			}, { // 完善车辆信息
-				path: '/supplement/:isRegister',
+			}, 
+			/**
+			 * 完善车辆信息
+             * @param {String} pageType 页面状态 register editor creater
+			 */
+			{
+				path: '/supplement/:pageType',
 				component: VmSupplement,
 				meta: { title: '完善车辆信息' },
 			}
@@ -114,12 +119,16 @@ var VmMain = {
 		return {
 			// 手机号码
 			phoneValue: '',
+
 			// 验证号码
 			verifyNumber: '',
+
 			// 是否 正在获取验证码
 			isVerifyGeting: false,
+
 			// 倒计时60秒
 			countDown: 60,
+			
 			// 是否同意协议
 			isAgreement: false,
 		};
@@ -150,7 +159,14 @@ var VmMain = {
 					})(i);
 				}
 			}
-		}
+		},
+
+		/**
+		 * 获取验证码
+		 */
+		submitRegister: function submitRegister() {
+			this.$router.push({ path: '/supplement/register' });
+		},
 	},
 };
 
@@ -182,7 +198,19 @@ var VmMyCar = {
 	},
 
 	methods: {
+		/**
+		 * 编辑 车辆信息
+		 */
+		jumpToEditor: function jumpToEditor() {
+			this.$router.push({ path: '/supplement/editor' });
+		},
 
+		/**
+		 * 新增 车辆信息
+		 */
+		jumpToCreater: function jumpToCreater() {
+			this.$router.push({ path: '/supplement/creater' });
+		},
 	}
 }
 
@@ -195,8 +223,13 @@ var VmSupplement = {
 
 	data: function data() {
 		return {
-			// 是否属于注册流程
-			isRegister: false,
+			/**
+			 * 页面状态
+             * @param {String} register 注册状态 
+             * @param {String} editor 编辑状态
+             * @param {String} creater 新增状态 
+			 */
+			pageType: 'register',
 
 			// 车牌号省份
 			carNoProvince: '粤',
@@ -215,8 +248,8 @@ var VmSupplement = {
 	mounted: function mounted() {
 		var _this = this;
 		
-		// 是否属于注册流程
-		this.isRegister = this.$route.params.isRegister === 'register' ? true : false;
+		// 页面状态
+		this.pageType = this.$route.params.pageType;
 		
 		// 实例化 车牌选择
 		this.myCarKeyBoard = new CarKeyBoard({bindInputDom: 'ycpd-carplateid-input'});

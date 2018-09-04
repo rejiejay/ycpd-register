@@ -90,7 +90,7 @@
     </div>
 
     <!-- 提交 -->
-    <div class="register-submit">
+    <div class="register-submit" @click="submitRegister">
         <div class="register-submit-content">确认</div>
     </div>
 </div>
@@ -106,6 +106,7 @@
             <div class="mycar-list-item"
                 v-for="(item, key) in carList" 
                 :key="key"
+                @click="jumpToEditor"
             >
                 <div class="list-item-content flex-start-center">
                     <div class="list-item-main flex-rest">
@@ -126,7 +127,7 @@
     <!-- 车辆信息 新增 -->
     <div class="mycar-add">
         <div class="mycar-add-position">
-            <div class="mycar-add-content">添加车辆</div>
+            <div class="mycar-add-content" @click="jumpToCreater">添加车辆</div>
         </div>
     </div>
 </div>
@@ -271,7 +272,7 @@
 
     <!-- 暂不添加  -->
     <!-- 如果是注册流程, 则渲染这个按钮 -->
-    <div class="submit-button submit-cancel" v-if="isRegister" >
+    <div class="submit-button submit-cancel" v-if="pageType === 'register'" >
         <div class="submit-button-content">暂不添加</div>
     </div>
 </div>
