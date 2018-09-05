@@ -418,7 +418,10 @@
             
             <div class="input-item flex-start">
                 <div class="input-item-title">车&ensp;&ensp;&ensp;&ensp;系:</div>
+
+                <!-- 当车系列表为空时候, 显示placeholder占位符 -->
                 <div v-if="seriesList.length === 0" class="input-item-main flex-rest item-show-placeholder" @click="selectTip">请选择车辆车系</div>
+                
                 <div v-else class="input-item-main flex-rest input-item-select"
                     v-bind:class="{'item-show-placeholder' : (carSeries === '')}"
                 >
@@ -441,10 +444,21 @@
             
             <div class="input-item flex-start">
                 <div class="input-item-title">年&ensp;&ensp;&ensp;&ensp;份:</div>
-                <div class="input-item-main flex-rest"
-                    v-bind:class="{'item-show-placeholder' : !false}"
+
+                <!-- 当车型年份列表为空时候, 显示placeholder占位符 -->
+                <div v-if="yearsList.length === 0" class="input-item-main flex-rest item-show-placeholder" @click="selectTip">请选择车辆年份</div>
+
+                <div v-else class="input-item-main flex-rest input-item-select"
+                    v-bind:class="{'item-show-placeholder' : (carYears === '')}"
                 >
-                    请选择车辆年份
+                    <select v-model="carYears">
+                        <option value="" disabled :selected="carYears === ''" hidden>请选择车辆车系</option>
+                        <option 
+                            v-for="(years, key) in yearsList" 
+                            :key="key"
+                            :value="years"
+                        >{{years}}</option>
+                    </select>
                 </div>
                 <div class="input-item-icon flex-start-center">
                     <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >
@@ -456,10 +470,21 @@
             
             <div class="input-item flex-start">
                 <div class="input-item-title">车&ensp;&ensp;&ensp;&ensp;型:</div>
-                <div class="input-item-main flex-rest"
-                    v-bind:class="{'item-show-placeholder' : !false}"
+
+                <!-- 当车辆具体型号列表为空时候, 显示placeholder占位符 -->
+                <div v-if="yearModelList.length === 0" class="input-item-main flex-rest item-show-placeholder" @click="selectTip">请选择车辆车型</div>
+
+                <div v-else class="input-item-main flex-rest input-item-select"
+                    v-bind:class="{'item-show-placeholder' : (carYearModel === '')}"
                 >
-                    请选择车辆车型
+                    <select v-model="carYearModel">
+                        <option value="" disabled :selected="carYearModel === ''" hidden>请选择车辆车系</option>
+                        <option 
+                            v-for="(yearModeItem, key) in yearModelList" 
+                            :key="key"
+                            :value="yearModeItem"
+                        >{{yearModeItem}}</option>
+                    </select>
                 </div>
                 <div class="input-item-icon flex-start-center">
                     <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >

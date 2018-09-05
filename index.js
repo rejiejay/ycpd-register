@@ -117,7 +117,7 @@ var ajaxs = {
 	},
 
     /**
-     * 获取 品牌型号 列表
+     * 获取 车型品牌的型号 列表
 	 * @param {String} brand 车辆品牌 
      */
 	getSeries: function getSeries(brand) {
@@ -148,6 +148,96 @@ var ajaxs = {
 				}
 			});
 		});
+	},
+
+    /**
+     * 获取 车型年份 列表
+	 * @param {String} series 车型品牌的型号名称 
+     */
+	getCarYears: function getCarYears(series) {
+		/**
+		 * 因为 车型现在以 Session 来保存 
+		 * 而本地环境是没有 Session 的, 所以返回死数据
+		 */
+		if (window.location.origin === 'file://') {
+			return new Promise(function (resolve, reject) {
+				resolve([{"yearNames":"2016"},{"yearNames":"2015"},{"yearNames":"2014"},{"yearNames":"2013"},{"yearNames":"2012"},{"yearNames":"2011"},{"yearNames":"2010"},{"yearNames":"2009"},{"yearNames":"2008"},{"yearNames":"2007"},{"yearNames":"2006"},{"yearNames":"2005"},{"yearNames":"2004"},{"yearNames":"2003"},{"yearNames":"2000"},{"yearNames":"1999"},{"yearNames":"1998"},{"yearNames":"1997"},{"yearNames":"1996"},{"yearNames":"1995"},{"yearNames":"1994"},{"yearNames":"1992"}]);
+			});
+		} else {
+			Vue.prototype.$indicator.open('正在加载数据...');
+
+			return new Promise(function (resolve, reject) {
+				var form = new FormData();
+				form.append("action", "GetYears");
+				form.append("SeriesName", series);
+				
+				$.ajax({
+					url: config.url.carBrandSeries,
+					type: "POST",
+					data: form,
+					processData: false,
+					contentType: false,
+					success: function(res){
+						Vue.prototype.$indicator.close();
+						if (res && res instanceof Array && res.length > 0) {
+							resolve(res);
+						} else {
+							reject('向服务器发起请求车型年份列表成功, 但是数据有误!');
+						}
+					},
+					error: function (XMLHttpRequest, textStatus, errorThrown) {
+						Vue.prototype.$indicator.close();
+						reject('向服务器发起请求车型年份列表失败, 原因: ' + errorThrown);
+					}
+				});
+			});
+		}
+	},
+
+    /**
+     * 获取 车辆具体型号 列表
+	 * @param {String} series 车型品牌的型号名称 
+	 * @param {String} years 车型的年份 
+     */
+	getCarYearModel: function getCarYearModel(series, years) {
+		/**
+		 * 因为 车型现在以 Session 来保存 
+		 * 而本地环境是没有 Session 的, 所以返回死数据
+		 */
+		if (window.location.origin === 'file://') {
+			return new Promise(function (resolve, reject) {
+				resolve([{"yearModel":"740Li 3.0T 手自一体 豪华型"},{"yearModel":"740Li 3.0T 手自一体 领先型"},{"yearModel":"740Li 3.0T 手自一体 尊享型"},{"yearModel":"750LixDrive 4.4T 手自一体 四座版"},{"yearModel":"750LixDrive 4.4T 手自一体 五座版"}]);
+			});
+		} else {
+			Vue.prototype.$indicator.open('正在加载数据...');
+
+			return new Promise(function (resolve, reject) {
+				var form = new FormData();
+				form.append("action", "GetModel");
+				form.append("SeriesName", series);
+				form.append("years", years);
+				
+				$.ajax({
+					url: config.url.carBrandSeries,
+					type: "POST",
+					data: form,
+					processData: false,
+					contentType: false,
+					success: function(res){
+						Vue.prototype.$indicator.close();
+						if (res && res instanceof Array && res.length > 0) {
+							resolve(res);
+						} else {
+							reject('向服务器发起请求车辆具体型号列表成功, 但是数据有误!');
+						}
+					},
+					error: function (XMLHttpRequest, textStatus, errorThrown) {
+						Vue.prototype.$indicator.close();
+						reject('向服务器发起请求车辆具体型号列表失败, 原因: ' + errorThrown);
+					}
+				});
+			});
+		}
 	},
 };
 
@@ -323,10 +413,26 @@ var VmSupplement = {
 			],
 
 			/**
-			 * 车系
+			 * 车型品牌的型号
 			 */ 
-			carSeries: '', // 选择中的车系
-			seriesList: [ // 选择中的车系列表
+			carSeries: '', // 选择中的车型品牌的型号
+			seriesList: [ // 车型品牌的型号列表
+				// 'X6'
+			],
+
+			/**
+			 * 车型年份 列表
+			 */ 
+			carYears: '', // 选择中的车型年份
+			yearsList: [ // 车型年份 列表
+				// 'X6'
+			],
+
+			/**
+			 * 车辆具体型号 列表
+			 */ 
+			carYearModel: '', // 选择中的车辆具体型号
+			yearModelList: [ // 车辆具体型号 列表
 				// 'X6'
 			],
 		}
@@ -384,14 +490,24 @@ var VmSupplement = {
 		},
 
 		/**
-		 * 选择 车辆品牌
+		 * 选择 车型品牌的型号
 		 * 并且初始化 series 车系号
 		 */
 		selectCarBrand: function selectCarBrand(item) {
 			var _this = this;
 
-			this.brandModalVisible = false; // 模态框
-			this.carBrand = item;
+			this.brandModalVisible = false; // 模态框 隐藏
+			this.carBrand = item; // 设置为选中的
+
+			/**
+			 * 清空数据
+			 */
+			this.carSeries = '';
+			this.seriesList = [];
+			this.carYears = '';
+			this.yearsList = [];
+			this.carYearModel = '';
+			this.yearModelList = [];
 			
 			ajaxs.getSeries(item) // 获取车系号
 			.then(function (series) {
@@ -407,11 +523,16 @@ var VmSupplement = {
 		 * 品牌车系年份车型 提示 选择顺序
 		 */
 		selectTip: function selectTip() {
-			if (this.carSeries === '') {
-				// 先判断 是否选择中的车辆品牌
+			if (this.carBrand === '') {
+				// 先判断 是否选择中的 车辆品牌
 				alert('请先选择车辆品牌');
-			} else if (this.carBrand === '') {
-				// 判断 是否选择中的车辆车系
+
+			} else if (this.carSeries === '') {
+				// 判断 是否选择中的车 型品牌的型号
+				alert('请先选择车系');
+			
+			} else if (this.carYears === '') {
+				// 判断 是否选择中的 车型年份
 				alert('请先选择车系');
 			}
 		}
@@ -419,10 +540,59 @@ var VmSupplement = {
 
 	watch: {
 		/**
-		 * 监听选择中的车系
+		 * 监听选择中的 车型品牌的型号
 		 */
 		carSeries: function (newCarSeries, oldCarSeries) {
+			// 车型品牌的型号 为空的时候, 表示清空操作
+			// 清空操作不执行任何请求
+			if (newCarSeries === '') {
+				return false;
+			}
+			const _this = this;
 
+			/**
+			 * 清空数据
+			 */
+			this.carYears = '';
+			this.yearsList = [];
+			this.carYearModel = '';
+			this.yearModelList = [];
+	
+			ajaxs.getCarYears(newCarSeries) // 获取 车型年份 列表
+			.then(function (years) {
+				_this.yearsList = years.map(function (item) {
+					return item.yearNames
+				});
+			}, function (error) {
+				alert(error);
+			});
+		},
+
+		/**
+		 * 监听选择中的 选择中的车型年份
+		 */
+		carYears: function (newCarYears, oldCarYears) {
+			// 车型品牌的型号 为空的时候, 表示清空操作
+			// 清空操作不执行任何请求
+			if (newCarYears === '') {
+				return false;
+			}
+			const _this = this;
+
+			/**
+			 * 清空数据
+			 */
+			this.carYearModel = '';
+			this.yearModelList = [];
+	
+			ajaxs.getCarYearModel(this.carSeries, newCarYears) // 获取 车辆具体型号 列表
+			.then(function (carYearModel) {
+				_this.yearModelList = carYearModel.map(function (item) {
+					return item.yearModel
+				});
+			}, function (error) {
+				alert(error);
+			});
 		},
 	}
 }
