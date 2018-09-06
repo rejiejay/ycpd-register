@@ -530,8 +530,9 @@
         </div>
     </div>
 
-    <!-- 是否为默认车辆 -->
-    <div class="is-setting-default">
+    <!-- 是否为默认车辆 
+    如果是注册流程, 则不渲染这个按钮 -->
+    <div class="is-setting-default" v-if="pageType !== 'register'">
         <div class="setting-default-content flex-start-center">
             <div class="setting-default-main flex-rest">是否设为默认车辆</div>
             <span>{{isDefaultSetting ? '是' : '否'}}</span>
@@ -551,7 +552,7 @@
 
     <!-- 暂不添加
     如果是注册流程, 则渲染这个按钮 -->
-    <div class="submit-button submit-cancel" v-if="pageType === 'register'" >
+    <div class="submit-button submit-cancel" v-if="pageType === 'register'">
         <div class="submit-button-content">暂不添加</div>
     </div>
 </div>
