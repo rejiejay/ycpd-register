@@ -534,9 +534,10 @@
     <div class="is-setting-default">
         <div class="setting-default-content flex-start-center">
             <div class="setting-default-main flex-rest">是否设为默认车辆</div>
+            <span>{{isDefaultSetting ? '是' : '否'}}</span>
             <div class="setting-default-switch">
                 <label for="switch-cp" class="weui-switch-cp">
-                    <input id="switch-cp" ref="settingDefault" class="weui-switch-cp__input" type="checkbox">
+                    <input v-model="isDefaultSetting" id="switch-cp" ref="settingDefault" class="weui-switch-cp__input" type="checkbox">
                     <div class="weui-switch-cp__box"></div>
                 </label>
             </div>

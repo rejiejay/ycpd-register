@@ -10,8 +10,8 @@ var config = (function () { // 匿名函数自执行
 		return {
 			url: {
 				origin: 'http://store.demo.ichebaoyang.com', // 请求源(服务器地址)
-				// 车辆品牌车系链接
-				carBrandSeries: 'http://store.demo.ichebaoyang.com/wx/Handler.ashx',
+				// 车辆品牌车系以及短信验证码
+				carBrandSeriesCode: 'http://store.demo.ichebaoyang.com/wx/Handler.ashx',
 			}
 		}
 
@@ -20,8 +20,8 @@ var config = (function () { // 匿名函数自执行
 		return {
 			url: {
 				origin: 'http://ycpdapi.hotgz.com', // 请求源(服务器地址)
-				// 车辆品牌车系链接
-				carBrandSeries: '/wx/Handler.ashx',
+				// 车辆品牌车系以及短信验证码
+				carBrandSeriesCode: '/wx/Handler.ashx',
 			}
 		}
 	}
@@ -97,7 +97,7 @@ var ajaxs = {
 			form.append("action", "GetBrand");
 			
 			$.ajax({
-				url: config.url.carBrandSeries,
+				url: config.url.carBrandSeriesCode,
 				type: "POST",
                 data: form,
                 processData: false,
@@ -129,7 +129,7 @@ var ajaxs = {
 			form.append("brand", brand);
 			
 			$.ajax({
-				url: config.url.carBrandSeries,
+				url: config.url.carBrandSeriesCode,
 				type: "POST",
                 data: form,
                 processData: false,
@@ -172,7 +172,7 @@ var ajaxs = {
 				form.append("SeriesName", series);
 				
 				$.ajax({
-					url: config.url.carBrandSeries,
+					url: config.url.carBrandSeriesCode,
 					type: "POST",
 					data: form,
 					processData: false,
@@ -218,7 +218,7 @@ var ajaxs = {
 				form.append("years", years);
 				
 				$.ajax({
-					url: config.url.carBrandSeries,
+					url: config.url.carBrandSeriesCode,
 					type: "POST",
 					data: form,
 					processData: false,
@@ -238,6 +238,37 @@ var ajaxs = {
 				});
 			});
 		}
+	},
+
+    /**
+     * 获取 手机验证码
+     */
+	getMobileCode: function getMobileCode() {
+		Vue.prototype.$indicator.open('正在加载数据...');
+
+		return new Promise(function (resolve, reject) {
+			var form = new FormData();
+			
+			$.ajax({
+				url: config.url.carBrandSeriesCode,
+				type: "POST",
+				data: form,
+				processData: false,
+				contentType: false,
+				success: function(res){
+					Vue.prototype.$indicator.close();
+					if (res && res instanceof Array && res.length > 0) {
+						resolve(res);
+					} else {
+						reject('向服务器发起请求车辆具体型号列表成功, 但是数据有误!');
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					Vue.prototype.$indicator.close();
+					reject('向服务器发起请求车辆具体型号列表失败, 原因: ' + errorThrown);
+				}
+			});
+		});
 	},
 };
 
@@ -435,6 +466,11 @@ var VmSupplement = {
 			yearModelList: [ // 车辆具体型号 列表
 				// 'X6'
 			],
+
+			/**
+			 * 是否设为默认车辆
+			 */ 
+			isDefaultSetting: false,
 		}
 	},
 
@@ -542,7 +578,7 @@ var VmSupplement = {
 		/**
 		 * 监听选择中的 车型品牌的型号
 		 */
-		carSeries: function (newCarSeries, oldCarSeries) {
+		carSeries: function carSeries(newCarSeries, oldCarSeries) {
 			// 车型品牌的型号 为空的时候, 表示清空操作
 			// 清空操作不执行任何请求
 			if (newCarSeries === '') {
@@ -571,7 +607,7 @@ var VmSupplement = {
 		/**
 		 * 监听选择中的 选择中的车型年份
 		 */
-		carYears: function (newCarYears, oldCarYears) {
+		carYears: function carYears(newCarYears, oldCarYears) {
 			// 车型品牌的型号 为空的时候, 表示清空操作
 			// 清空操作不执行任何请求
 			if (newCarYears === '') {
