@@ -40,16 +40,25 @@ var init = {
 	initVue: function initVue() {
 		// 路由配置
 		var routes = [
+			/**
+			 * 注册
+             * @param {String} openid 用户标识 o9rEN0_rX4ySFsIbKi5MBL8YGnAg
+			 */
 			{
-				path: '/', // 注册
+				path: '/:openid', // 注册
 				component: VmMain,
 				meta: { title: '注册' },
-			},{
+			}, {
 				path: '/agreement', // 用户协议页
 				component: VmAgreement,
 				meta: { title: '养车频道用户服务协议' },
-			}, { // 我的车辆列表
-				path: '/mycar',
+			}, 
+			/**
+			 * 我的车辆列表
+             * @param {String} openid 用户标识 o9rEN0_rX4ySFsIbKi5MBL8YGnAg
+			 */
+			{ // 我的车辆列表
+				path: '/mycar/:openid',
 				component: VmMyCar,
 				meta: { title: '我的车辆' },
 			}, 
@@ -161,7 +170,7 @@ var ajaxs = {
 		 */
 		if (window.location.origin === 'file://') {
 			return new Promise(function (resolve, reject) {
-				resolve([{"yearNames":"2016"},{"yearNames":"2015"},{"yearNames":"2014"},{"yearNames":"2013"},{"yearNames":"2012"},{"yearNames":"2011"},{"yearNames":"2010"},{"yearNames":"2009"},{"yearNames":"2008"},{"yearNames":"2007"},{"yearNames":"2006"},{"yearNames":"2005"},{"yearNames":"2004"},{"yearNames":"2003"},{"yearNames":"2000"},{"yearNames":"1999"},{"yearNames":"1998"},{"yearNames":"1997"},{"yearNames":"1996"},{"yearNames":"1995"},{"yearNames":"1994"},{"yearNames":"1992"}]);
+				resolve([{"yearNames":"2016"}, {"yearNames":"2015"}, {"yearNames":"2014"}, {"yearNames":"2013"}, {"yearNames":"2012"}, {"yearNames":"2011"}, {"yearNames":"2010"}, {"yearNames":"2009"}, {"yearNames":"2008"}, {"yearNames":"2007"}, {"yearNames":"2006"}, {"yearNames":"2005"}, {"yearNames":"2004"}, {"yearNames":"2003"}, {"yearNames":"2000"}, {"yearNames":"1999"}, {"yearNames":"1998"}, {"yearNames":"1997"}, {"yearNames":"1996"}, {"yearNames":"1995"}, {"yearNames":"1994"}, {"yearNames":"1992"}]);
 			});
 		} else {
 			Vue.prototype.$indicator.open('正在加载数据...');
@@ -206,7 +215,7 @@ var ajaxs = {
 		 */
 		if (window.location.origin === 'file://') {
 			return new Promise(function (resolve, reject) {
-				resolve([{"yearModel":"740Li 3.0T 手自一体 豪华型"},{"yearModel":"740Li 3.0T 手自一体 领先型"},{"yearModel":"740Li 3.0T 手自一体 尊享型"},{"yearModel":"750LixDrive 4.4T 手自一体 四座版"},{"yearModel":"750LixDrive 4.4T 手自一体 五座版"}]);
+				resolve([{"yearModel":"740Li 3.0T 手自一体 豪华型"}, {"yearModel":"740Li 3.0T 手自一体 领先型"}, {"yearModel":"740Li 3.0T 手自一体 尊享型"}, {"yearModel":"750LixDrive 4.4T 手自一体 四座版"}, {"yearModel":"750LixDrive 4.4T 手自一体 五座版"}]);
 			});
 		} else {
 			Vue.prototype.$indicator.open('正在加载数据...');
@@ -302,10 +311,31 @@ var VmMain = {
 
 	methods: {
 		/**
+		 * 校验手机号码
+		 */
+		verifyPhoneValue: function verifyPhoneValue() {
+			if (this.phoneValue === '') {
+				return utils.consequencer.error('手机号码不能为空');
+			}
+
+			// 正则匹配表达式: https://github.com/VincentSit/ChinaMobilePhoneNumberRegex
+			if (/^(?=\d{11}$)^1(?:3\d|4[57]|5[^4\D]|66|7[^249\D]|8\d|9[89])\d{8}$/.test(this.phoneValue) === false) {
+				return utils.consequencer.error('请输入正确的手机号码格式');
+			}
+
+			return utils.consequencer.success();
+		},
+
+		/**
 		 * 获取验证码
 		 */
 		verifyNumberHandle: function verifyNumberHandle() {
 			const _this = this;
+
+			// 校验手机号码
+			if (this.verifyPhoneValue().result !== 1) {
+				return alert(this.verifyPhoneValue().message);
+			}
 
 			// 判断是否正在获取验证码
 			if (this.isVerifyGeting === false) {
@@ -333,9 +363,26 @@ var VmMain = {
 		},
 
 		/**
-		 * 获取验证码
+		 * 校验验证号码是否正确
+		 * 并且跳转到下一页
 		 */
 		submitRegister: function submitRegister() {
+
+			// 校验手机号码
+			if (this.verifyPhoneValue().result !== 1) {
+				return alert(this.verifyPhoneValue().message);
+			}
+
+			// 校验验证码
+			if (this.verifyNumber.length !== 6) {
+				return alert('请输入正确格式验证码!');
+			}
+
+			// 用户协议
+			if (this.isAgreement === false) {
+				return alert('请同意用户协议!');
+			}
+
 			this.$router.push({ path: '/supplement/register' });
 		},
 	},
@@ -638,5 +685,37 @@ var utils = {
 	// 获取URL参数
 	loadPageVar: function loadPageVar(sVar) {
 		return decodeURI(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURI(sVar).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+	},
+
+	// 封装
+	consequencer: {
+		/**
+		 * 请求成功
+		 * @param {any} data 返回成功的数据封装
+		 * @param {string} message 返回成功的信息封装
+		 * @return {any} 成功封装的结果
+		 */
+		success: function success(data, message) {
+			return {
+				result: 1,
+				data: data || null,
+				message: message || 'success'
+			}
+		},
+
+		/**
+		 * 请求失败
+		 * @param {string} message 返回失败的信息封装
+		 * @param {number} result 返回失败的数据封装
+		 * @param {any} data 返回失败的数据封装
+		 * @return {any} 失败封装的结果
+		 */
+		error: function error(message, result, data) {
+			return {
+				result: result || 0,
+				data: data || null,
+				message: message
+			}
+		},
 	},
 };
