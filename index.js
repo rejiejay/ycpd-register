@@ -12,6 +12,12 @@ var config = (function () { // 匿名函数自执行
 				origin: 'http://store.demo.ichebaoyang.com', // 请求源(服务器地址)
 				// 车辆品牌车系以及短信验证码
 				carBrandSeriesCode: 'http://store.demo.ichebaoyang.com/wx/Handler.ashx',
+				/**
+				 * 获取手机验证码
+				 * http://api.demo.hotgz.com/ 找不到与请求 URI“http://localhost:85/Customer/GetVerifyCode”匹配的 HTTP 资源。
+				 * http://store.demo.ichebaoyang.com/ 应用程序“YCPD_WX_JSZX”中的服务器错误, 暂时用下面这个
+				 */
+				getMobileCode: 'http://ycpdapi.hotgz.com/Customer/GetVerifyCode',
 			}
 		}
 
@@ -22,6 +28,8 @@ var config = (function () { // 匿名函数自执行
 				origin: 'http://ycpdapi.hotgz.com', // 请求源(服务器地址)
 				// 车辆品牌车系以及短信验证码
 				carBrandSeriesCode: '/wx/Handler.ashx',
+				// 获取手机验证码
+				getMobileCode: 'http://ycpdapi.hotgz.com/Customer/GetVerifyCode',
 			}
 		}
 	}
@@ -250,31 +258,33 @@ var ajaxs = {
 	},
 
     /**
-     * 获取 手机验证码
+     * 获取 短信验证码
+	 * @param {String} Mobile 手机号码 
+	 * @param {String} Jigsaw 图形验证码移动的距离
      */
-	getMobileCode: function getMobileCode() {
+	getMobileCode: function getMobileCode(Mobile, Jigsaw) {
 		Vue.prototype.$indicator.open('正在加载数据...');
 
 		return new Promise(function (resolve, reject) {
-			var form = new FormData();
-			
 			$.ajax({
-				url: config.url.carBrandSeriesCode,
+				url: config.url.getMobileCode,
 				type: "POST",
-				data: form,
-				processData: false,
-				contentType: false,
+				dataType : 'json',
+				data: {
+					Mobile: Mobile,
+					Jigsaw: Jigsaw,
+				},
 				success: function(res){
 					Vue.prototype.$indicator.close();
-					if (res && res instanceof Array && res.length > 0) {
+					if (res && res.Code === 200) {
 						resolve(res);
 					} else {
-						reject('向服务器发起请求车辆具体型号列表成功, 但是数据有误!');
+						reject('向服务器发起请求短信验证码成功, 但是数据有误!');
 					}
 				},
 				error: function (XMLHttpRequest, textStatus, errorThrown) {
 					Vue.prototype.$indicator.close();
-					reject('向服务器发起请求车辆具体型号列表失败, 原因: ' + errorThrown);
+					reject('向服务器发起请求短信验证码失败, 原因: ' + errorThrown);
 				}
 			});
 		});
@@ -339,19 +349,25 @@ var VmMain = {
 
 			// 判断是否正在获取验证码
 			if (this.isVerifyGeting === false) {
-				this.isVerifyGeting = true; // 表示正在获取
-				// 定时器倒计时 60 秒
-				for(var i = 0; i < 60; i++ ) {
-					(function (i) { // 匿名函数自执行创建闭包
-						setTimeout(function() {
-							_this.countDown--;
-							if (i === 59) {
-								_this.countDown = 60;
-								_this.isVerifyGeting = false;
-							}
-						}, i * 1000);
-					})(i);
-				}
+				// 图形验证码移动的距离 暂时为零
+				ajaxs.getMobileCode(this.phoneValue, 0)
+				.then(function () {
+					_this.isVerifyGeting = true; // 表示正在获取
+					// 定时器倒计时 60 秒
+					for(var i = 0; i < 60; i++ ) {
+						(function (i) { // 匿名函数自执行创建闭包
+							setTimeout(function() {
+								_this.countDown--;
+								if (i === 59) {
+									_this.countDown = 60;
+									_this.isVerifyGeting = false;
+								}
+							}, i * 1000);
+						})(i);
+					}
+				}, function (error) {
+					alert(error);
+				});
 			}
 		},
 
