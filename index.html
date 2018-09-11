@@ -366,7 +366,7 @@
             <div class="input-item flex-start">
                 <div class="input-item-title">车架号码:</div>
                 <div class="input-item-main flex-rest flex-start-center">
-                    <input v-model="platVin" class="item-rigth-input" placeholder="请输入车架号码" />
+                    <input v-model="platVin" v-on:blur="platVinExchange" class="item-rigth-input" placeholder="请输入车架号码" />
                 </div>
                 <div class="input-item-tip flex-start-center" @click="dialogTip = true;">
                     <svg t="1530501234558" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2537" xmlns:xlink="http://www.w3.org/1999/xlink" 
@@ -399,6 +399,7 @@
         <div class="supplement-input-title">输入车架号可为您自动解析车辆型号</div>
         <div class="input-list-content">
 
+            <!-- 品牌 -->
             <div class="input-item flex-start"
                 @click="brandModalVisible = true;"
             >
@@ -416,6 +417,7 @@
             </div>
             <div class="input-line"></div>
             
+            <!-- 车系 -->
             <div class="input-item flex-start">
                 <div class="input-item-title">车&ensp;&ensp;&ensp;&ensp;系:</div>
 
@@ -425,7 +427,7 @@
                 <div v-else class="input-item-main flex-rest input-item-select"
                     v-bind:class="{'item-show-placeholder' : (carSeries === '')}"
                 >
-                    <select v-model="carSeries">
+                    <select v-model="carSeries" @click="isPlatExchange = false;">
                         <option value="" disabled :selected="carSeries === ''" hidden>请选择车辆车系</option>
                         <option 
                             v-for="(series, key) in seriesList" 
@@ -442,6 +444,7 @@
             </div>
             <div class="input-line"></div>
             
+            <!-- 年份 -->
             <div class="input-item flex-start">
                 <div class="input-item-title">年&ensp;&ensp;&ensp;&ensp;份:</div>
 
@@ -451,7 +454,7 @@
                 <div v-else class="input-item-main flex-rest input-item-select"
                     v-bind:class="{'item-show-placeholder' : (carYears === '')}"
                 >
-                    <select v-model="carYears">
+                    <select v-model="carYears" @click="isPlatExchange = false;">
                         <option value="" disabled :selected="carYears === ''" hidden>请选择车辆车系</option>
                         <option 
                             v-for="(years, key) in yearsList" 
@@ -468,6 +471,7 @@
             </div>
             <div class="input-line"></div>
             
+            <!-- 车型 -->
             <div class="input-item flex-start">
                 <div class="input-item-title">车&ensp;&ensp;&ensp;&ensp;型:</div>
 

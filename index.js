@@ -18,6 +18,8 @@ var config = (function () { // 匿名函数自执行
 				 * http://store.demo.ichebaoyang.com/ 应用程序“YCPD_WX_JSZX”中的服务器错误, 暂时用下面这个
 				 */
 				getMobileCode: 'http://ycpdapi.hotgz.com/Customer/GetVerifyCode',
+				// 通过VIN查询公众接口获取车型列表
+				getCarModelByVin: 'http://ycpdapi.hotgz.com/Customer/GetCarModelByVin',
 			}
 		}
 
@@ -30,6 +32,8 @@ var config = (function () { // 匿名函数自执行
 				carBrandSeriesCode: '/wx/Handler.ashx',
 				// 获取手机验证码
 				getMobileCode: 'http://ycpdapi.hotgz.com/Customer/GetVerifyCode',
+				// 通过VIN查询公众接口获取车型列表
+				getCarModelByVin: 'http://ycpdapi.hotgz.com/Customer/GetCarModelByVin',
 			}
 		}
 	}
@@ -53,11 +57,12 @@ var init = {
              * @param {String} openid 用户标识 o9rEN0_rX4ySFsIbKi5MBL8YGnAg
 			 */
 			{
-				path: '/:openid', // 注册
+				path: '/index/:openid', // 注册
+				alias: ['/'],
 				component: VmMain,
 				meta: { title: '注册' },
 			}, {
-				path: '/agreement', // 用户协议页
+				path: '/agreement/', // 用户协议页
 				component: VmAgreement,
 				meta: { title: '养车频道用户服务协议' },
 			}, 
@@ -289,6 +294,25 @@ var ajaxs = {
 			});
 		});
 	},
+
+    /**
+     * 通过VIN查询公众接口获取车型列表
+	 * @param {String} vin Vehicle Identification Number（车辆识别码） 
+     */
+	getCarModelByVin: function getMobileCode(vin) {
+		Vue.prototype.$indicator.open('正在加载数据...');
+
+		return new Promise(function (resolve, reject) {
+			$.get(config.url.getCarModelByVin, {vin: vin}, function(response, status, xhr) {
+				Vue.prototype.$indicator.close();
+				if (response && response.Code === 200 && response.Data instanceof Array && response.Data.length > 0) {
+					resolve(response.Data[0]);
+				} else {
+					reject();
+				}
+			});
+		});
+	},
 };
 
 /**
@@ -375,7 +399,7 @@ var VmMain = {
 		 * 跳转到 养车频道用户服务协议
 		 */
 		jumpToAgreement: function jumpToAgreement() {
-			this.$router.push({ path: '/agreement' });
+			this.$router.push({ path: '/agreement/' });
 		},
 
 		/**
@@ -490,6 +514,7 @@ var VmSupplement = {
 			 * 车架号码 提示信息
 			 */ 
 			platVin: '', // 车架号码
+			isPlatExchange: false, // 是否交换操作
 			dialogTip: false, // 驾驶证 提示信息
 
 			/**
@@ -575,6 +600,98 @@ var VmSupplement = {
 		},
 
 		/**
+		 * 初始化 品牌 车系列表
+		 * @param {string} carBrand 选择中的车辆品牌
+		 * @param {string} carSeries 选择中的车型品牌的型号 (非必填) 这个是通过VIN查询公众接口获取车型的时候带进去的
+		 */
+		initCarSeries: function initCarSeries(carBrand, carSeries) {
+			var _this = this;
+			
+			ajaxs.getSeries(carBrand) // 获取车系号
+			.then(function (series) {
+				
+				var isRepeated = false; // 是否拥有通过VIN查询公众接口获取车型的“重复”数据
+				_this.seriesList = series.map(function (item) {
+
+					// 判断是否拥有通过VIN查询公众接口获取车型的数据
+					if (carSeries && carSeries === item.brandSeriesName) {
+						isRepeated = true;
+					}
+					
+					return item.brandSeriesName
+				});
+
+				if (carSeries && isRepeated === false) {
+					_this.seriesList.push(carSeries);
+				}
+			}, function (error) {
+				alert(error);
+			});
+
+		},
+
+		/**
+		 * 初始化 车型年份 列表
+		 * @param {string} carSeries 选择中的 车辆品牌车系
+		 * @param {string} carYears 选择中的车型年份 (非必填) 这个是通过VIN查询公众接口获取车型的时候带进去的
+		 */
+		initCarYears: function initCarYears(carSeries, carYears) {
+			var _this = this;
+			
+			ajaxs.getCarYears(carSeries) // 获取 车型年份 列表
+			.then(function (years) {
+				var isRepeated = false;  // 是否拥有通过VIN查询公众接口获取车型的“重复”数据
+
+				_this.yearsList = years.map(function (item) {
+					
+					// 判断是否拥有通过VIN查询公众接口获取车型的数据
+					if (carYears && carYears === item.yearNames) {
+						isRepeated = true;
+					}
+
+					return item.yearNames
+				});
+
+				if (carYears && isRepeated === false) {
+					_this.yearsList.push(carYears);
+				}
+			}, function (error) {
+				alert(error);
+			});
+		},
+
+		/**
+		 * 初始化 车辆具体型号 列表
+		 * @param {string} carSeries 选择中的 车辆品牌车系
+		 * @param {string} newCarYears 选择中的 车辆品牌车系年份
+		 * @param {string} newCarYearModel 选择中的 车辆具体型号 (非必填) 这个是通过VIN查询公众接口获取车型的时候带进去的
+		 */
+		initCarYearModel: function initCarYearModel(carSeries, newCarYears, newCarYearModel) {
+			var _this = this;
+
+			ajaxs.getCarYearModel(carSeries, newCarYears) // 获取 车辆具体型号 列表
+			.then(function (carYearModel) {
+				var isRepeated = false;  // 是否拥有通过VIN查询公众接口获取车型的“重复”数据
+
+				_this.yearModelList = carYearModel.map(function (item) {
+					
+					// 判断是否拥有通过VIN查询公众接口获取车型的数据
+					if (newCarYearModel && newCarYearModel === item.yearModel) {
+						isRepeated = true;
+					}
+
+					return item.yearModel
+				});
+
+				if (newCarYearModel && isRepeated === false) {
+					_this.yearModelList.push(newCarYearModel);
+				}
+			}, function (error) {
+				alert(error);
+			});
+		},
+
+		/**
 		 * 选择车牌省份
 		 */
 		selectProvince: function selectProvince() {
@@ -593,7 +710,6 @@ var VmSupplement = {
 		 * 并且初始化 series 车系号
 		 */
 		selectCarBrand: function selectCarBrand(item) {
-			var _this = this;
 
 			this.brandModalVisible = false; // 模态框 隐藏
 			this.carBrand = item; // 设置为选中的
@@ -607,15 +723,8 @@ var VmSupplement = {
 			this.yearsList = [];
 			this.carYearModel = '';
 			this.yearModelList = [];
-			
-			ajaxs.getSeries(item) // 获取车系号
-			.then(function (series) {
-				_this.seriesList = series.map(function (item) {
-					return item.brandSeriesName
-				});
-			}, function (error) {
-				alert(error);
-			});
+
+			this.initCarSeries(item); // 初始化 品牌 车系列表
 		},
 
 		/**
@@ -634,7 +743,38 @@ var VmSupplement = {
 				// 判断 是否选择中的 车型年份
 				alert('请先选择车系');
 			}
-		}
+		},
+
+		/**
+		 * 通过VIN查询公众接口获取车型列表
+		 */
+		platVinExchange: function platVinExchange() {
+			var _this = this;
+
+			// 十七个英数组成, 英文字母“I”、“O”、“Q”均不会被使用
+			if (this.platVin.length ===  17) {
+				
+				ajaxs.getCarModelByVin(this.platVin) // 查询失败不做处理
+				.then(function (carInfor) {
+					_this.isPlatExchange = true; // 表示交换操作
+					
+					// 选择中的车辆品牌
+					_this.carBrand = carInfor.Brand; 
+
+					// 选择中的车型品牌的型号
+					_this.carSeries = carInfor.Series; 
+					_this.initCarSeries(carInfor.Brand, carInfor.Series);
+					
+					// 选择中的车型年份
+					_this.carYears = carInfor.ListingYear; 
+					_this.initCarYears(carInfor.Series, carInfor.ListingYear);
+					
+					// 选择中的车辆具体型号
+					_this.carYearModel = carInfor.SalesName; 
+					_this.initCarYearModel(carInfor.Series, carInfor.ListingYear, carInfor.SalesName);
+				});
+			}
+		},
 	},
 
 	watch: {
@@ -647,8 +787,12 @@ var VmSupplement = {
 			if (newCarSeries === '') {
 				return false;
 			}
-			const _this = this;
 
+			// 通过VIN查询公众接口获取车型列表
+			if (this.isPlatExchange) {
+				return false;
+			}
+			
 			/**
 			 * 清空数据
 			 */
@@ -657,14 +801,8 @@ var VmSupplement = {
 			this.carYearModel = '';
 			this.yearModelList = [];
 	
-			ajaxs.getCarYears(newCarSeries) // 获取 车型年份 列表
-			.then(function (years) {
-				_this.yearsList = years.map(function (item) {
-					return item.yearNames
-				});
-			}, function (error) {
-				alert(error);
-			});
+			// 初始化 车型年份 列表
+			this.initCarYears(newCarSeries);
 		},
 
 		/**
@@ -676,7 +814,11 @@ var VmSupplement = {
 			if (newCarYears === '') {
 				return false;
 			}
-			const _this = this;
+
+			// 通过VIN查询公众接口获取车型列表
+			if (this.isPlatExchange) {
+				return false;
+			}
 
 			/**
 			 * 清空数据
@@ -684,14 +826,8 @@ var VmSupplement = {
 			this.carYearModel = '';
 			this.yearModelList = [];
 	
-			ajaxs.getCarYearModel(this.carSeries, newCarYears) // 获取 车辆具体型号 列表
-			.then(function (carYearModel) {
-				_this.yearModelList = carYearModel.map(function (item) {
-					return item.yearModel
-				});
-			}, function (error) {
-				alert(error);
-			});
+			// 获取 车辆具体型号 列表
+			this.initCarYearModel(this.carSeries, newCarYears);
 		},
 	}
 }
