@@ -23,7 +23,7 @@ var config = (function () { // 匿名函数自执行
 				// 车主注册
 				register: 'http://ycpdapi.hotgz.com/Customer/Register',
 				// 初始化微信JS-SDK
-                getWxConfig: 'http://picc.hotgz.com/wx/apiHandler.ashx',
+                getWxConfig: 'http://store.demo.ichebaoyang.com/wx/apiHandler.ashx',
 			}
 		}
 
@@ -41,7 +41,7 @@ var config = (function () { // 匿名函数自执行
 				// 车主注册
 				register: 'http://ycpdapi.hotgz.com/Customer/Register',
 				// 初始化微信JS-SDK
-                getWxConfig: 'http://store.demo.ichebaoyang.com/wx/apiHandler.ashx',
+                getWxConfig: 'http://picc.hotgz.com/wx/apiHandler.ashx',
 			}
 		}
 	}
@@ -121,6 +121,7 @@ var ajaxs = {
 	OpenID: '', // 用户标识
 	Mobile: '', // 手机号码
 	VerifyCode: '', // 手机验证码
+	City: '深圳', // 所在城市 (默认深圳)
 
 	/**
      * 获取 车辆品牌 列表
@@ -334,18 +335,57 @@ var ajaxs = {
 	 * @param {String} Series 车系
 	 * @param {String} Years 年份
 	 * @param {String} Model 车型
-	 * @param {String} City 所在城市
+	 * 
+	 * @param {String} this.City 所在城市
 	 * @param {String} this.OpenID 用户标识
 	 * @param {String} this.Mobile 手机号码
 	 * @param {String} this.VerifyCode 手机验证码
      */
-	register: function register() {
+	register: function register(CarNo, VinNo, Brand, Series, Years, Model) {
+		var OpenID = this.OpenID;
 		var Mobile = this.Mobile;
 		var VerifyCode = this.VerifyCode;
-		var OpenID = this.OpenID;
+		var City = this.City;
+
+		Vue.prototype.$indicator.open('正在加载数据...');
+
+		return new Promise(function (resolve, reject) {
+			$.ajax({
+				url: config.url.register,
+				type: "POST",
+				dataType : 'json',
+				data: {
+					OpenID: OpenID,
+					Mobile: Mobile,
+					VerifyCode: VerifyCode,
+					CarNo: CarNo,
+					VinNo: VinNo,
+					Brand: Brand,
+					Series: Series,
+					Years: Years,
+					Model: Model,
+					City: City
+				},
+				success: function(res){
+					Vue.prototype.$indicator.close();
+					if (res && res.Code === 200) {
+						resolve(res);
+					} else {
+						reject('注册失败，原因:' + res);
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					Vue.prototype.$indicator.close();
+					reject('向服务器发起请求车主注册失败, 原因: ' + errorThrown);
+				}
+			});
+		});
 	},
 };
 
+/**
+ * 定位类
+ */
 var wxLocation = {
     /**
      * 初始化微信JS-SDK
@@ -510,7 +550,16 @@ var VmMain = {
 		};
 	},
 
-	mounted: function mounted() { },
+	mounted: function mounted() { 
+		// 初始化位置信息
+		wxLocation.init()
+		.then(function(position) {
+			wxLocation.getCityName(position)
+			.then(function(cityName) {
+				ajaxs.City = cityName;
+			});
+		});
+	},
 
 	methods: {
 		/**
@@ -992,15 +1041,25 @@ var VmSupplement = {
 		},
 
 		/**
-		 * 注册提交
+		 * 注册提交按钮
 		 */
 		registerSubmit: function registerSubmit() {
 			// 表单校验
-			this.verifyAll();
+			var myVerifyAll = this.verifyAll();
+			if (myVerifyAll.result !== 1) {
+				alert(myVerifyAll.message);
+			}
 
 			// 判断页面状态
 			if (this.pageType === '注册状态') {
-
+				ajaxs.register(
+					this.carNoProvince + this.plateNo, // 车牌号
+					this.platVin, // 车架号
+					this.carBrand, // 品牌
+					this.carSeries, // 型号
+					this.carYears, // 年份
+					this.carYearModel // 车辆具体型号
+				)
 			}
 		},
 	},
