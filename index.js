@@ -20,6 +20,8 @@ var config = (function () { // 匿名函数自执行
 				getMobileCode: 'http://ycpdapi.hotgz.com/Customer/GetVerifyCode',
 				// 通过VIN查询公众接口获取车型列表
 				getCarModelByVin: 'http://ycpdapi.hotgz.com/Customer/GetCarModelByVin',
+				// 车主注册
+				register: 'http://ycpdapi.hotgz.com/Customer/Register',
 			}
 		}
 
@@ -34,6 +36,8 @@ var config = (function () { // 匿名函数自执行
 				getMobileCode: 'http://ycpdapi.hotgz.com/Customer/GetVerifyCode',
 				// 通过VIN查询公众接口获取车型列表
 				getCarModelByVin: 'http://ycpdapi.hotgz.com/Customer/GetCarModelByVin',
+				// 车主注册
+				register: 'http://ycpdapi.hotgz.com/Customer/Register',
 			}
 		}
 	}
@@ -110,7 +114,11 @@ var init = {
 
 // ajaxs请求类
 var ajaxs = {
-    /**
+	OpenID: '', // 用户标识
+	Mobile: '', // 手机号码
+	VerifyCode: '', // 手机验证码
+
+	/**
      * 获取 车辆品牌 列表
      */
 	getBrand: function getBrand() {
@@ -313,6 +321,25 @@ var ajaxs = {
 			});
 		});
 	},
+
+    /**
+     * 车主注册
+	 * @param {String} CarNo 车牌号
+	 * @param {String} VinNo 车架号
+	 * @param {String} Brand 品牌
+	 * @param {String} Series 车系
+	 * @param {String} Years 年份
+	 * @param {String} Model 车型
+	 * @param {String} City 所在城市
+	 * @param {String} this.OpenID 用户标识
+	 * @param {String} this.Mobile 手机号码
+	 * @param {String} this.VerifyCode 手机验证码
+     */
+	register: function register() {
+		var Mobile = this.Mobile;
+		var VerifyCode = this.VerifyCode;
+		var OpenID = this.OpenID;
+	},
 };
 
 /**
@@ -422,6 +449,11 @@ var VmMain = {
 			if (this.isAgreement === false) {
 				return alert('请同意用户协议!');
 			}
+
+			// 存储数据到 ajaxs (全局)
+			ajaxs.OpenID = this.$route.params.openid;
+			ajaxs.Mobile = this.phoneValue;
+			ajaxs.VerifyCode = this.verifyNumber;
 
 			this.$router.push({ path: '/supplement/register' });
 		},
@@ -627,7 +659,6 @@ var VmSupplement = {
 			}, function (error) {
 				alert(error);
 			});
-
 		},
 
 		/**
