@@ -806,6 +806,61 @@ var VmSupplement = {
 				});
 			}
 		},
+
+		/**
+		 * 表单校验
+		 */
+		verifyAll: function verifyAll() {
+			// 校验车牌 省份
+			
+			if (this.plateNo.length === '') {
+				return utils.consequencer.error('车牌号码不能为空!');
+			} else if (this.plateNo.length !== 5 && this.plateNo.length !== 6) {
+				return utils.consequencer.error('车牌号码有误!');
+			}
+
+			// 校验车架号码
+			if (this.platVin.length ===  '') {
+				return utils.consequencer.error('车架号码不能为空!');
+			} else if (this.plateNo.length !==  17) {
+				return utils.consequencer.error('车牌号码有误!');
+			}
+			
+			// 校验 车辆品牌
+			if (this.carBrand === '') {
+				return utils.consequencer.error('请选择车辆品牌!');
+			}
+			
+			// 校验 车型品牌的型号
+			if (this.carSeries === '') {
+				return utils.consequencer.error('请选择车型品牌的型号!');
+			}
+			
+			// 校验 车型年份
+			if (this.carYears === '') {
+				return utils.consequencer.error('请选择车型年份!');
+			}
+			
+			// 校验 车辆具体型号
+			if (this.carYearModel === '') {
+				return utils.consequencer.error('请选择车辆具体型号!');
+			}
+
+			return utils.consequencer.success();
+		},
+
+		/**
+		 * 注册提交
+		 */
+		registerSubmit: function registerSubmit() {
+			// 表单校验
+			this.verifyAll();
+
+			// 判断页面状态
+			if (this.pageType === '注册状态') {
+
+			}
+		},
 	},
 
 	watch: {
