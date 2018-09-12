@@ -38,9 +38,7 @@
 <body>
 
 <div id="app">
-    <keep-alive>
-        <router-view></router-view>
-    </keep-alive>
+    <router-view></router-view>
 </div>
 
 <!-- 注册 -->
@@ -311,7 +309,7 @@
             <div class="mycar-list-item"
                 v-for="(item, key) in carList" 
                 :key="key"
-                @click="jumpToEditor"
+                @click="jumpToEditor(item.nativeData)"
             >
                 <div class="list-item-content flex-start-center">
                     <div class="list-item-main flex-rest">

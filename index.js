@@ -9,21 +9,30 @@ var config = (function () { // 匿名函数自执行
 		// 测试环境
 		return {
 			url: {
-				origin: 'http://store.demo.ichebaoyang.com', // 请求源(服务器地址)
+				origin1: 'http://store.demo.ichebaoyang.com', // 请求源(服务器地址)
+				origin2: 'http://api.demo.hotgz.com', // 请求源(服务器地址)
+			
 				// 车辆品牌车系以及短信验证码
 				carBrandSeriesCode: 'http://store.demo.ichebaoyang.com/wx/Handler.ashx',
+			
 				/**
 				 * 获取手机验证码
 				 * http://api.demo.hotgz.com/ 找不到与请求 URI“http://localhost:85/Customer/GetVerifyCode”匹配的 HTTP 资源。
 				 * http://store.demo.ichebaoyang.com/ 应用程序“YCPD_WX_JSZX”中的服务器错误, 暂时用下面这个
 				 */
-				getMobileCode: 'http://ycpdapi.hotgz.com/Customer/GetVerifyCode',
+				getMobileCode: 'http://api.demo.hotgz.com/Customer/GetVerifyCode',
+			
 				// 通过VIN查询公众接口获取车型列表
-				getCarModelByVin: 'http://ycpdapi.hotgz.com/Customer/GetCarModelByVin',
+				getCarModelByVin: 'http://api.demo.hotgz.com/Customer/GetCarModelByVin',
+			
 				// 车主注册
-				register: 'http://ycpdapi.hotgz.com/Customer/Register',
+				register: 'http://api.demo.hotgz.com/Customer/Register',
+			
 				// 初始化微信JS-SDK
-                getWxConfig: 'http://store.demo.ichebaoyang.com/wx/apiHandler.ashx',
+				getWxConfig: 'http://store.demo.ichebaoyang.com/wx/apiHandler.ashx',
+				
+				// 获取车主的车辆信息
+				getCarList: 'http://api.demo.hotgz.com/Customer/GetCarList',
 			}
 		}
 
@@ -31,17 +40,26 @@ var config = (function () { // 匿名函数自执行
 		// 线上生产环境
 		return {
 			url: {
-				origin: 'http://ycpdapi.hotgz.com', // 请求源(服务器地址)
+				origin1: 'http://picc.hotgz.com', // 请求源(服务器地址)
+				origin2: 'http://ycpdapi.hotgz.com', // 请求源(服务器地址)
+				
 				// 车辆品牌车系以及短信验证码
 				carBrandSeriesCode: '/wx/Handler.ashx',
+				
 				// 获取手机验证码
 				getMobileCode: 'http://ycpdapi.hotgz.com/Customer/GetVerifyCode',
+				
 				// 通过VIN查询公众接口获取车型列表
 				getCarModelByVin: 'http://ycpdapi.hotgz.com/Customer/GetCarModelByVin',
+				
 				// 车主注册
 				register: 'http://ycpdapi.hotgz.com/Customer/Register',
+				
 				// 初始化微信JS-SDK
                 getWxConfig: 'http://picc.hotgz.com/wx/apiHandler.ashx',
+				
+				// 获取车主的车辆信息
+				getCarList: 'http://ycpdapi.hotgz.com/Customer/GetCarList',
 			}
 		}
 	}
@@ -62,7 +80,7 @@ var init = {
 		var routes = [
 			/**
 			 * 注册
-             * @param {String} openid 用户标识 o9rEN0_rX4ySFsIbKi5MBL8YGnAg
+             * @param {String} openid 微信 用户标识 o9rEN0_rX4ySFsIbKi5MBL8YGnAg
 			 */
 			{
 				path: '/index/:openid', // 注册
@@ -74,15 +92,17 @@ var init = {
 				component: VmAgreement,
 				meta: { title: '养车频道用户服务协议' },
 			}, 
+			
 			/**
 			 * 我的车辆列表
-             * @param {String} openid 用户标识 o9rEN0_rX4ySFsIbKi5MBL8YGnAg
+             * @param {String} customerid 养车频道 用户标识 180910010001949590
 			 */
 			{ // 我的车辆列表
-				path: '/mycar/:openid',
+				path: '/mycar/:customerid',
 				component: VmMyCar,
 				meta: { title: '我的车辆' },
 			}, 
+
 			/**
 			 * 完善车辆信息
              * @param {String} pageType 页面状态 register editor creater
@@ -122,6 +142,8 @@ var ajaxs = {
 	Mobile: '', // 手机号码
 	VerifyCode: '', // 手机验证码
 	City: '深圳', // 所在城市 (默认深圳)
+	customerid: '', // 用户 id
+	carid: '', // 编辑的车辆 id
 
 	/**
      * 获取 车辆品牌 列表
@@ -381,6 +403,27 @@ var ajaxs = {
 			});
 		});
 	},
+
+    /**
+     * 获取车主的车辆信息
+	 * @param {String} this.customerid 养车频道 用户标识
+     */
+	getCarList: function getCarList() {
+		var customerid = this.customerid;
+		Vue.prototype.$indicator.open('正在加载数据...');
+
+		return new Promise(function (resolve, reject) {
+			$.get(config.url.getCarList, {CustomerID: customerid}, function(response, status, xhr) {
+				Vue.prototype.$indicator.close();
+
+				if (response && response.Code === 200 && response.Data instanceof Array) {
+					resolve(response.Data);
+				} else {
+					reject('获取车主的车辆信息失败, 原因: ' + response.Msg);
+				}
+			});
+		});
+	}
 };
 
 /**
@@ -646,7 +689,7 @@ var VmMain = {
 			ajaxs.Mobile = this.phoneValue;
 			ajaxs.VerifyCode = this.verifyNumber;
 
-			this.$router.push({ path: '/supplement/register' });
+			this.$router.replace({ path: '/supplement/register' });
 		},
 	},
 };
@@ -676,28 +719,43 @@ var VmMyCar = {
 		return {
 			// 车辆列表
 			carList: [
-				{
-					carNo: '粤B12345', // 车牌号
-					carType: '比亚迪-泰', // 车牌号
-					isDefault: true, // 是否默认
-				}, {
-					carNo: '粤B12345', // 车牌号
-					carType: '比亚迪-泰', // 车牌号
-					isDefault: false, // 是否默认
-				}
+				// {
+				//  nativeData: {}, // 原始数据
+				// 	carNo: '粤B12345', // 车牌号
+				// 	carType: '比亚迪-泰', // 车牌号
+				// 	isDefault: true, // 是否默认
+				// }
 			],
 		}
 	},
 
 	mounted: function mounted() {
+		var _this = this;
+		ajaxs.customerid = this.$route.params.customerid;
+
+		ajaxs.getCarList()
+		.then(function (carList) {
+			_this.carList = carList.map(function (item, key) {
+				return {
+					nativeData: JSON.parse(JSON.stringify(item)),
+					carNo: item.CarNo, // 车牌号
+					carType: item.Model + item.Brand, // 车辆类型
+					isDefault: (item.IsDefault === 1), // 1为默认车辆 0为非默认车辆
+				}
+			});
+		}, function (error) {
+			alert(error);
+		});
 	},
 
 	methods: {
 		/**
 		 * 编辑 车辆信息
+		 * @param {Object} nativeData 原始数据
 		 */
-		jumpToEditor: function jumpToEditor() {
-			this.$router.push({ path: '/supplement/editor' });
+		jumpToEditor: function jumpToEditor(nativeData) {
+			ajaxs.carid = nativeData.CarID; // 赋值到 ajaxs里面存储
+			this.$router.push({ path: '/supplement/editor', query: nativeData });
 		},
 
 		/**
@@ -801,6 +859,31 @@ var VmSupplement = {
 
 		// 初始化 车辆品牌 列表
 		this.initCarBrand();
+
+		// 判断 页面是否 编辑状态
+		if (this.pageType === 'editor') {
+			// 如果是编辑状态, 初始化页面数据
+			var query = this.$route.query;
+			
+			this.isPlatExchange = true; // 表示交换操作
+					
+			// 选择中的车辆品牌
+			this.carBrand = query.Brand; 
+
+			// 选择中的车型品牌的型号
+			this.carSeries = query.Series; 
+			this.initCarSeries(query.Brand, query.Series);
+			
+			// 选择中的车型年份
+			this.carYears = query.Years; 
+			this.initCarYears(query.Series, query.Years);
+			
+			// 选择中的车辆具体型号
+			this.carYearModel = query.Series; 
+			this.initCarYearModel(query.Series, query.Years, query.Series);
+
+			this.isDefaultSetting = (query.IsDefault === 1);
+		}
 	},
 
 	methods: {
