@@ -735,14 +735,20 @@ var VmMyCar = {
 
 		ajaxs.getCarList()
 		.then(function (carList) {
-			_this.carList = carList.map(function (item, key) {
-				return {
-					nativeData: JSON.parse(JSON.stringify(item)),
-					carNo: item.CarNo, // 车牌号
-					carType: item.Model + item.Brand, // 车辆类型
-					isDefault: (item.IsDefault === 1), // 1为默认车辆 0为非默认车辆
-				}
-			});
+			// 判断数据是否为空
+			if (carList.length > 0) {
+				_this.carList = carList.map(function (item, key) {
+					return {
+						nativeData: JSON.parse(JSON.stringify(item)),
+						carNo: item.CarNo, // 车牌号
+						carType: item.Model + item.Brand, // 车辆类型
+						isDefault: (item.IsDefault === 1), // 1为默认车辆 0为非默认车辆
+					}
+				});
+			} else {
+				// 否则跳转到新增车辆信息页面
+				_this.jumpToCreater();
+			}
 		}, function (error) {
 			alert(error);
 		});
@@ -849,21 +855,20 @@ var VmSupplement = {
 		// 页面状态 初始化
 		this.pageType = this.$route.params.pageType;
 
-		// 实例化 车牌选择
-		this.myCarKeyBoard = new CarKeyBoard({bindInputDom: 'ycpd-carplateid-input'});
-
-		// 绑定 车牌号码输入
-        this.myCarKeyBoard.succeedHandle(function (result) {
-            _this.plateNo = result;
-		});
-
-		// 初始化 车辆品牌 列表
-		this.initCarBrand();
-
 		// 判断 页面是否 编辑状态
 		if (this.pageType === 'editor') {
 			// 如果是编辑状态, 初始化页面数据
 			var query = this.$route.query;
+
+			this.carNoProvince = query.CarNo.slice(0,1); // 车牌号省份
+
+			this.plateNo = query.CarNo.slice(1); // 车牌号码	
+			this.myCarKeyBoard = new CarKeyBoard({ // 实例化 车牌选择, 并且把 车牌号码 带进去
+				bindInputDom: 'ycpd-carplateid-input',
+				plateNo: this.plateNo,
+			});
+
+			this.platVin = query.CarNo.slice(1); // 车架号码
 			
 			this.isPlatExchange = true; // 表示交换操作
 					
@@ -883,7 +888,21 @@ var VmSupplement = {
 			this.initCarYearModel(query.Series, query.Years, query.Series);
 
 			this.isDefaultSetting = (query.IsDefault === 1);
+		} else {
+			// 实例化 车牌选择
+			this.myCarKeyBoard = new CarKeyBoard({
+				bindInputDom: 'ycpd-carplateid-input'
+			});
 		}
+
+
+		// 绑定 车牌号码输入
+        this.myCarKeyBoard.succeedHandle(function (result) {
+            _this.plateNo = result;
+		});
+
+		// 初始化 车辆品牌 列表
+		this.initCarBrand();
 	},
 
 	methods: {
