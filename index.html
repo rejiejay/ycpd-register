@@ -70,15 +70,15 @@
     </div>
 
     <!-- 人机验证模态框 -->
-    <div class="machine-verify-modal flex-center">
-        <div class="verify-modal-shade"></div>
+    <div class="machine-verify-modal flex-center" :class="{'machine-verify-show': isMachineModalShow}">
+        <div class="verify-modal-shade" @click="isMachineModalShow === false"></div>
         <div class="verify-modal-main" :style="'width: ' + (clientWidth - 30) + 'px;'">
 
             <div class="modal-main-title">人机验证</div>
             
             <div class="modal-main-input flex-start-center">
                 <input class="flex-rest" v-model="machineNumber" placeholder="输入4位手机验证码" />
-                <div class="flex-center"><img /></div>
+                <div class="flex-center" @click="renderBase64MachineNumber"><img ref="base64MachineNumber" src="" /></div>
             </div>
             
             <div class="main-confirm-content">

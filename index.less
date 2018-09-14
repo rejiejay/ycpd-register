@@ -100,6 +100,7 @@
 
     // 人机验证模态框
     .machine-verify-modal {
+        display: none;
         position: fixed;
         width: 100%;
         height: 100%;
@@ -151,6 +152,10 @@
                 background-color: transparent;
             }
 
+            div {
+                height: 100%;
+            }
+
             input::-webkit-input-placeholder,
             input::-moz-placeholder,   /* Mozilla Firefox 19+ */
             input:-moz-placeholder,  /* Mozilla Firefox 4 to 18 */
@@ -173,6 +178,10 @@
                 background-color: #E50012;
             }
         }
+    }
+
+    .machine-verify-show {
+        display: flex;
     }
     
     // 协议

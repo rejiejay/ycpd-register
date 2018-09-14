@@ -33,6 +33,9 @@ var config = (function () { // 匿名函数自执行
 				
 				// 获取车主的车辆信息
 				getCarList: 'http://api.demo.hotgz.com/Customer/GetCarList',
+
+				// 获取人机验证码
+				getMachineCode: 'http://api.demo.hotgz.com/Customer/GetVCodeImage',
 			}
 		}
 
@@ -60,6 +63,9 @@ var config = (function () { // 匿名函数自执行
 				
 				// 获取车主的车辆信息
 				getCarList: 'http://ycpdapi.hotgz.com/Customer/GetCarList',
+
+				// 获取人机验证码
+				getMachineCode: 'http://ycpdapi.hotgz.com/Customer/GetVCodeImage',
 			}
 		}
 	}
@@ -423,6 +429,13 @@ var ajaxs = {
 				}
 			});
 		});
+	},
+
+    /**
+     * 获取人机验证码
+     */
+	getMachineCode: function getMachineCode() {
+		return config.url.getMachineCode + '?openid=' + this.OpenID + '?id=' + Math.floor(Math.random() * 1000);
 	}
 };
 
@@ -581,6 +594,9 @@ var VmMain = {
 			// 手机号码
 			phoneValue: '',
 
+			// 是否显示人机验证码模态框
+			isMachineModalShow: false,
+
 			// 人机验证码
 			machineNumber: '',
 
@@ -599,6 +615,9 @@ var VmMain = {
 	},
 
 	mounted: function mounted() { 
+		// 页面状态 初始化
+		ajaxs.OpenID = this.$route.params.openid;
+		
 		// 初始化位置信息
 		wxLocation.init()
 		.then(function(position) {
@@ -610,6 +629,7 @@ var VmMain = {
 	},
 
 	methods: {
+		
 		/**
 		 * 校验手机号码
 		 */
@@ -630,7 +650,6 @@ var VmMain = {
 		 * 获取验证码
 		 */
 		verifyNumberHandle: function verifyNumberHandle() {
-			const _this = this;
 
 			// 校验手机号码
 			if (this.verifyPhoneValue().result !== 1) {
@@ -638,27 +657,44 @@ var VmMain = {
 			}
 
 			// 判断是否正在获取验证码
-			if (this.isVerifyGeting === false) {
-				// 图形验证码移动的距离 暂时为零
-				ajaxs.getMobileCode(this.phoneValue, 0)
-				.then(function () {
-					_this.isVerifyGeting = true; // 表示正在获取
-					// 定时器倒计时 60 秒
-					for(var i = 0; i < 60; i++ ) {
-						(function (i) { // 匿名函数自执行创建闭包
-							setTimeout(function() {
-								_this.countDown--;
-								if (i === 59) {
-									_this.countDown = 60;
-									_this.isVerifyGeting = false;
-								}
-							}, i * 1000);
-						})(i);
-					}
-				}, function (error) {
-					alert(error);
-				});
+			if (this.isVerifyGeting === false) { // 没有获取验证码的情况
+				
+				this.isMachineModalShow = true; // 弹出模态框
+				this.renderBase64MachineNumber();
+				// // 图形验证码移动的距离 暂时为零
+				// ajaxs.getMobileCode(this.phoneValue, 0)
+				// .then(function () {
+				// 	_this.isVerifyGeting = true; // 表示正在获取
+				// 	// 定时器倒计时 60 秒
+				// 	for(var i = 0; i < 60; i++ ) {
+				// 		(function (i) { // 匿名函数自执行创建闭包
+				// 			setTimeout(function() {
+				// 				_this.countDown--;
+				// 				if (i === 59) {
+				// 					_this.countDown = 60;
+				// 					_this.isVerifyGeting = false;
+				// 				}
+				// 			}, i * 1000);
+				// 		})(i);
+				// 	}
+				// }, function (error) {
+				// 	alert(error);
+				// });
 			}
+		},
+
+		/**
+		 * 渲染验证码
+		 */
+		renderBase64MachineNumber: function renderBase64MachineNumber() {
+			this.$refs.base64MachineNumber.src = ajaxs.getMachineCode();
+		},
+
+		/**
+		 * 验证验证码是否正确
+		 */
+		checkVerifyCode: function checkVerifyCode() {
+			
 		},
 
 		/**
