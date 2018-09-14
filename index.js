@@ -416,7 +416,7 @@ var ajaxs = {
 					if (res && res.Code === 200) {
 						resolve(res);
 					} else {
-						reject('注册失败，原因:' + res);
+						reject('注册失败，原因:' + res.Msg);
 					}
 				},
 				error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -1254,9 +1254,9 @@ var VmSupplement = {
 					this.carYears, // 年份
 					this.carYearModel // 车辆具体型号
 				).then(function () {
-					alert('成功')
+					window.history.back(-1);
 				}, function (error) {
-					alert('失败');
+					alert('注册失败, 原因:' + error);
 				})
 			}
 		},
@@ -1267,9 +1267,9 @@ var VmSupplement = {
 		notToRegister: function notToRegister() {
 			ajaxs.register()
 			.then(function () {
-				alert('成功')
+				window.history.back(-1);
 			}, function (error) {
-				alert('失败');
+				alert('注册失败, 原因:' + error);
 			})
 		},
 	},
