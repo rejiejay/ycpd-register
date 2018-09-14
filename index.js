@@ -1198,18 +1198,17 @@ var VmSupplement = {
 		 */
 		verifyAll: function verifyAll() {
 			// 校验车牌 省份
-			
 			if (this.plateNo.length === '') {
 				return utils.consequencer.error('车牌号码不能为空!');
-			} else if (this.plateNo.length !== 5 && this.plateNo.length !== 6) {
+			} else if (this.plateNo.length < 5 && this.plateNo.length > 6) {
 				return utils.consequencer.error('车牌号码有误!');
 			}
 
 			// 校验车架号码
 			if (this.platVin.length ===  '') {
 				return utils.consequencer.error('车架号码不能为空!');
-			} else if (this.plateNo.length !==  17) {
-				return utils.consequencer.error('车牌号码有误!');
+			} else if (this.platVin.length !==  17) {
+				return utils.consequencer.error('车架号码有误!');
 			}
 			
 			// 校验 车辆品牌
@@ -1246,7 +1245,7 @@ var VmSupplement = {
 			}
 
 			// 判断页面状态
-			if (this.pageType === '注册状态') {
+			if (this.pageType === 'register') { // 注册状态
 				ajaxs.register(
 					this.carNoProvince + this.plateNo, // 车牌号
 					this.platVin, // 车架号
@@ -1254,7 +1253,11 @@ var VmSupplement = {
 					this.carSeries, // 型号
 					this.carYears, // 年份
 					this.carYearModel // 车辆具体型号
-				)
+				).then(function () {
+					alert('成功')
+				}, function (error) {
+					alert('失败');
+				})
 			}
 		},
 
