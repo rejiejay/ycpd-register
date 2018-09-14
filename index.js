@@ -387,23 +387,30 @@ var ajaxs = {
 
 		Vue.prototype.$indicator.open('正在加载数据...');
 
+		// 暂不添加的数据
+		var submitData = {
+			OpenID: OpenID,
+			Mobile: Mobile,
+			VerifyCode: VerifyCode,
+			City: City
+		}
+
+		// 所有信息
+		if (CarNo && VinNo && Brand && Series && Years && Model) {
+			submitData.CarNo = CarNo;
+			submitData.VinNo = VinNo;
+			submitData.Brand = Brand;
+			submitData.Series = Series;
+			submitData.Years = Years;
+			submitData.Model = Model;
+		}
+
 		return new Promise(function (resolve, reject) {
 			$.ajax({
 				url: config.url.register,
 				type: "POST",
 				dataType : 'json',
-				data: {
-					OpenID: OpenID,
-					Mobile: Mobile,
-					VerifyCode: VerifyCode,
-					CarNo: CarNo,
-					VinNo: VinNo,
-					Brand: Brand,
-					Series: Series,
-					Years: Years,
-					Model: Model,
-					City: City
-				},
+				data: submitData,
 				success: function(res){
 					Vue.prototype.$indicator.close();
 					if (res && res.Code === 200) {
@@ -1249,6 +1256,18 @@ var VmSupplement = {
 					this.carYearModel // 车辆具体型号
 				)
 			}
+		},
+
+		/**
+		 * 暂不添加
+		 */
+		notToRegister: function notToRegister() {
+			ajaxs.register()
+			.then(function () {
+				alert('成功')
+			}, function (error) {
+				alert('失败');
+			})
 		},
 	},
 

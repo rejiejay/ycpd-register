@@ -574,7 +574,7 @@
     <!-- 暂不添加
     如果是注册流程, 则渲染这个按钮 -->
     <div class="submit-button submit-cancel" v-if="pageType === 'register'">
-        <div class="submit-button-content">暂不添加</div>
+        <div class="submit-button-content" @click="notToRegister">暂不添加</div>
     </div>
 </div>
 </script>
