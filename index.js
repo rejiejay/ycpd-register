@@ -14,7 +14,7 @@ var config = (function () { // 匿名函数自执行
 			
 				// 车辆品牌车系以及短信验证码
 				carBrandSeriesCode: 'http://store.demo.ichebaoyang.com/wx/Handler.ashx',
-			
+
 				/**
 				 * 获取手机验证码
 				 * http://api.demo.hotgz.com/ 找不到与请求 URI“http://localhost:85/Customer/GetVerifyCode”匹配的 HTTP 资源。
@@ -576,8 +576,13 @@ var VmMain = {
 
 	data: function data() {
 		return {
+			clientWidth: document.body.offsetWidth || document.documentElement.clientWidth || window.innerWidth,
+
 			// 手机号码
 			phoneValue: '',
+
+			// 人机验证码
+			machineNumber: '',
 
 			// 验证号码
 			verifyNumber: '',

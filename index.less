@@ -25,6 +25,11 @@
 
 // 注册页
 .register {
+    // 人机验证模态框
+    @machine-verify-modal-z-index: 2;
+    @machine-verify-shade-z-index: 2;
+    @machine-verify-content-z-index: 3;
+
     // 输入
     .register-input {
         padding-top: 10px;
@@ -90,6 +95,83 @@
             background-color: #ddd;
             height: 1px;
             width: 100%;
+        }
+    }
+
+    // 人机验证模态框
+    .machine-verify-modal {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        left: 0px;
+        top: 0px;
+        z-index: @machine-verify-modal-z-index;
+
+        // 遮罩层
+        .verify-modal-shade {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0px;
+            top: 0px;
+            z-index: @machine-verify-shade-z-index;
+            background-color: rgba(0, 0, 0, 0.46);
+        }
+
+        // 内容
+        .verify-modal-main {
+            position: relative;
+            border-radius: 5px;
+            background: #fff;
+            z-index: @machine-verify-content-z-index;
+        }
+
+        // 标题
+        .modal-main-title {
+            padding-top: 15px;
+            padding-left: 15px;
+            padding-bottom: 15px;
+            font-size: 16px;
+            color: @black1;
+        }
+
+        .modal-main-input {
+            padding-left: 15px;
+            padding-right: 15px;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            height: 45px;
+
+            input {
+                line-height: 45px;
+                border: none;
+                outline: none;
+                font-size: 14px;
+                color: @black1;
+                background-color: transparent;
+            }
+
+            input::-webkit-input-placeholder,
+            input::-moz-placeholder,   /* Mozilla Firefox 19+ */
+            input:-moz-placeholder,  /* Mozilla Firefox 4 to 18 */
+            input:-ms-input-placeholder { /* Internet Explorer 10-11 */ 
+                color: @black1;
+            }
+        }
+
+        // 确认按钮
+        .main-confirm-content {
+            padding: 15px;
+
+            .modal-main-confirm {
+                height: 40px;
+                line-height: 40px;
+                font-size: 14px;
+                border-radius: 3px;
+                text-align: center;
+                color: #fff;
+                background-color: #E50012;
+            }
         }
     }
     

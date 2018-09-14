@@ -55,9 +55,9 @@
             </div>
             <div class="register-input-line"></div>
             <div class="register-input-item flex-start-center">
-                <div class="input-item-lable">验证号码:</div>
+                <div class="input-item-lable">短信验证:</div>
                 <div class="input-item-main flex-start-center flex-rest">
-                    <input v-model="verifyNumber" placeholder="输入6位手机验证码" />
+                    <input v-model="verifyNumber" placeholder="输入4位手机验证码" />
                 </div>
                 <div class="input-item-verify">
                     <div class="item-verify-content"
@@ -65,6 +65,24 @@
                         @click="verifyNumberHandle"
                     >{{isVerifyGeting ? (countDown + '秒后获取') : '获取验证码'}}</div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 人机验证模态框 -->
+    <div class="machine-verify-modal flex-center">
+        <div class="verify-modal-shade"></div>
+        <div class="verify-modal-main" :style="'width: ' + (clientWidth - 30) + 'px;'">
+
+            <div class="modal-main-title">人机验证</div>
+            
+            <div class="modal-main-input flex-start-center">
+                <input class="flex-rest" v-model="machineNumber" placeholder="输入4位手机验证码" />
+                <div class="flex-center"><img /></div>
+            </div>
+            
+            <div class="main-confirm-content">
+                <div class="modal-main-confirm">确认</div>
             </div>
         </div>
     </div>
