@@ -36,6 +36,9 @@ var config = (function () { // 匿名函数自执行
 
 				// 获取人机验证码
 				getMachineCode: 'http://api.demo.hotgz.com/Customer/GetVCodeImage',
+
+				// 校验验证码与手机号是否正确
+				checkVerifyCode: 'http://api.demo.hotgz.com/Customer/CheckVerifyCode',
 			}
 		}
 
@@ -66,6 +69,9 @@ var config = (function () { // 匿名函数自执行
 
 				// 获取人机验证码
 				getMachineCode: 'http://ycpdapi.hotgz.com/Customer/GetVCodeImage',
+
+				// 校验验证码与手机号是否正确
+				checkVerifyCode: 'http://ycpdapi.hotgz.com/Customer/CheckVerifyCode',
 			}
 		}
 	}
@@ -306,9 +312,12 @@ var ajaxs = {
     /**
      * 获取 短信验证码
 	 * @param {String} Mobile 手机号码 
-	 * @param {String} Jigsaw 图形验证码移动的距离
+	 * @param {String} Code 图形验证码
+	 * @param {String} this.OpenID 用户唯一ID
      */
-	getMobileCode: function getMobileCode(Mobile, Jigsaw) {
+	getMobileCode: function getMobileCode(Mobile, Code) {
+		var OpenID = this.OpenID;
+
 		Vue.prototype.$indicator.open('正在加载数据...');
 
 		return new Promise(function (resolve, reject) {
@@ -318,14 +327,15 @@ var ajaxs = {
 				dataType : 'json',
 				data: {
 					Mobile: Mobile,
-					Jigsaw: Jigsaw,
+					OpenID: OpenID,
+					Code: Code,
 				},
 				success: function(res){
 					Vue.prototype.$indicator.close();
-					if (res && res.Code === 200) {
+					if (res && res.Code === 200 && res.Msg === '') {
 						resolve(res);
 					} else {
-						reject('向服务器发起请求短信验证码成功, 但是数据有误!');
+						reject('向服务器发起请求短信验证码成功, 但是' + res.Msg);
 					}
 				},
 				error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -340,7 +350,7 @@ var ajaxs = {
      * 通过VIN查询公众接口获取车型列表
 	 * @param {String} vin Vehicle Identification Number（车辆识别码） 
      */
-	getCarModelByVin: function getMobileCode(vin) {
+	getCarModelByVin: function getCarModelByVin(vin) {
 		Vue.prototype.$indicator.open('正在加载数据...');
 
 		return new Promise(function (resolve, reject) {
@@ -435,8 +445,31 @@ var ajaxs = {
      * 获取人机验证码
      */
 	getMachineCode: function getMachineCode() {
-		return config.url.getMachineCode + '?openid=' + this.OpenID + '?id=' + Math.floor(Math.random() * 1000);
-	}
+		return config.url.getMachineCode + '?openid=' + this.OpenID + '&id=' + Math.floor(Math.random() * 1000);
+	},
+
+    /**
+     * 校验手机与短信验证码是否正确
+	 * @param {String} phoneValue 手机号码
+	 * @param {String} verifyNumber 短信验证码
+     */
+	verifyMobileCodeNumber: function verifyMobileCodeNumber(phoneValue, verifyNumber) {
+		Vue.prototype.$indicator.open('正在加载数据...');
+
+		return new Promise(function (resolve, reject) {
+			$.get(config.url.checkVerifyCode, {
+				mobile: phoneValue, // 手机号码
+				code: verifyNumber // 短信验证码
+			}, function(response, status, xhr) {
+				Vue.prototype.$indicator.close();
+				if (response && response.Code === 200 && response.Msg === '') {
+					resolve();
+				} else {
+					reject('短信验证码错误！');
+				}
+			});
+		});
+	},
 };
 
 /**
@@ -661,25 +694,6 @@ var VmMain = {
 				
 				this.isMachineModalShow = true; // 弹出模态框
 				this.renderBase64MachineNumber();
-				// // 图形验证码移动的距离 暂时为零
-				// ajaxs.getMobileCode(this.phoneValue, 0)
-				// .then(function () {
-				// 	_this.isVerifyGeting = true; // 表示正在获取
-				// 	// 定时器倒计时 60 秒
-				// 	for(var i = 0; i < 60; i++ ) {
-				// 		(function (i) { // 匿名函数自执行创建闭包
-				// 			setTimeout(function() {
-				// 				_this.countDown--;
-				// 				if (i === 59) {
-				// 					_this.countDown = 60;
-				// 					_this.isVerifyGeting = false;
-				// 				}
-				// 			}, i * 1000);
-				// 		})(i);
-				// 	}
-				// }, function (error) {
-				// 	alert(error);
-				// });
 			}
 		},
 
@@ -694,7 +708,32 @@ var VmMain = {
 		 * 验证验证码是否正确
 		 */
 		checkVerifyCode: function checkVerifyCode() {
-			
+			var _this = this;
+
+			if (this.machineNumber.length !== 4) {
+				return alert('请输入正确验证码');
+			}
+
+			// // 图形验证码移动的距离 暂时为零
+			ajaxs.getMobileCode(this.phoneValue, this.machineNumber)
+			.then(function () {
+				_this.isVerifyGeting = true; // 表示正在获取
+				_this.isMachineModalShow = false; // 弹出模态框
+				// 定时器倒计时 60 秒
+				for(var i = 0; i < 60; i++ ) {
+					(function (i) { // 匿名函数自执行创建闭包
+						setTimeout(function() {
+							_this.countDown--;
+							if (i === 59) {
+								_this.countDown = 60;
+								_this.isVerifyGeting = false;
+							}
+						}, i * 1000);
+					})(i);
+				}
+			}, function (error) {
+				alert(error);
+			}); 
 		},
 
 		/**
@@ -709,6 +748,7 @@ var VmMain = {
 		 * 并且跳转到下一页
 		 */
 		submitRegister: function submitRegister() {
+			var _this = this;
 
 			// 校验手机号码
 			if (this.verifyPhoneValue().result !== 1) {
@@ -716,7 +756,7 @@ var VmMain = {
 			}
 
 			// 校验验证码
-			if (this.verifyNumber.length !== 6) {
+			if (this.verifyNumber.length !== 4) {
 				return alert('请输入正确格式验证码!');
 			}
 
@@ -725,12 +765,17 @@ var VmMain = {
 				return alert('请同意用户协议!');
 			}
 
-			// 存储数据到 ajaxs (全局)
-			ajaxs.OpenID = this.$route.params.openid;
-			ajaxs.Mobile = this.phoneValue;
-			ajaxs.VerifyCode = this.verifyNumber;
+			ajaxs.verifyMobileCodeNumber(this.phoneValue, this.verifyNumber)
+			.then(function () {
+				// 存储数据到 ajaxs (全局)
+				ajaxs.OpenID = _this.$route.params.openid;
+				ajaxs.Mobile = _this.phoneValue;
+				ajaxs.VerifyCode = _this.verifyNumber;
+				_this.$router.replace({ path: '/supplement/register' });
+			}, function (error) {
+				alert(error);
+			})
 
-			this.$router.replace({ path: '/supplement/register' });
 		},
 	},
 };

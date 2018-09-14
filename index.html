@@ -71,7 +71,7 @@
 
     <!-- 人机验证模态框 -->
     <div class="machine-verify-modal flex-center" :class="{'machine-verify-show': isMachineModalShow}">
-        <div class="verify-modal-shade" @click="isMachineModalShow === false"></div>
+        <div class="verify-modal-shade" @click="isMachineModalShow = false"></div>
         <div class="verify-modal-main" :style="'width: ' + (clientWidth - 30) + 'px;'">
 
             <div class="modal-main-title">人机验证</div>
@@ -82,7 +82,7 @@
             </div>
             
             <div class="main-confirm-content">
-                <div class="modal-main-confirm">确认</div>
+                <div class="modal-main-confirm" @click="checkVerifyCode">确认</div>
             </div>
         </div>
     </div>
