@@ -39,6 +39,9 @@ var config = (function () { // 匿名函数自执行
 
 				// 校验验证码与手机号是否正确
 				checkVerifyCode: 'http://api.demo.hotgz.com/Customer/CheckVerifyCode',
+				
+				// 添加/编辑车主汽车
+				saveCar: 'http://api.demo.hotgz.com/Customer/SaveCar',
 			}
 		}
 
@@ -72,6 +75,9 @@ var config = (function () { // 匿名函数自执行
 
 				// 校验验证码与手机号是否正确
 				checkVerifyCode: 'http://ycpdapi.hotgz.com/Customer/CheckVerifyCode',
+				
+				// 添加/编辑车主汽车
+				saveCar: 'http://ycpdapi.hotgz.com/Customer/SaveCar',
 			}
 		}
 	}
@@ -446,6 +452,64 @@ var ajaxs = {
 				}
 			});
 		});
+	},
+
+    /**
+     * 添加/编辑车主汽车
+	 * @param {String} CarID 车唯一标识 存在表示 编辑 false 表示新增
+	 * @param {String} CarNo 车牌号
+	 * @param {String} VinNo 车架号
+	 * @param {String} Brand 品牌
+	 * @param {String} Series 车系
+	 * @param {String} Years 年份
+	 * @param {String} Model 车型
+	 * @param {boolean} IsDefault 是否默认
+	 * 
+	 * @param {String} this.customerid 养车频道 用户标识
+     */
+	saveCar: function saveCar(CarID, CarNo, VinNo, Brand, Series, Years, Model, IsDefault) {
+		var CustomerID = this.customerid;
+
+		Vue.prototype.$indicator.open('正在提交数据...');
+
+		// 所有信息
+		var submitData = {
+			CarNo: CarNo,
+			VIN: VinNo,
+			Brand: Brand,
+			Series: Series,
+			Years: Years,
+			Model: Model,
+			CustomerID: CustomerID,
+			IsDefault: IsDefault ? 1 : 0, 
+		}
+
+		// 存在表示 编辑
+		if (CarID) {
+			submitData.CarID = CarID;
+		}
+
+		return new Promise(function (resolve, reject) {
+			$.ajax({
+				url: config.url.saveCar,
+				type: "POST",
+				dataType : 'json',
+				data: submitData,
+				success: function(res){
+					Vue.prototype.$indicator.close();
+					if (res && res.Code === 200) {
+						resolve(res);
+					} else {
+						reject('添加/编辑失败，原因:' + res.Msg);
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					Vue.prototype.$indicator.close();
+					reject('向服务器发起请求车主添加/编辑失败, 原因: ' + errorThrown);
+				}
+			});
+		});
+
 	},
 
     /**
@@ -961,7 +1025,7 @@ var VmSupplement = {
 				plateNo: this.plateNo,
 			});
 
-			this.platVin = query.CarNo.slice(1); // 车架号码
+			this.platVin = query.VIN; // 车架号码
 			
 			this.isPlatExchange = true; // 表示交换操作
 					
@@ -988,7 +1052,6 @@ var VmSupplement = {
 			});
 		}
 
-
 		// 绑定 车牌号码输入
         this.myCarKeyBoard.succeedHandle(function (result) {
             _this.plateNo = result;
@@ -996,6 +1059,12 @@ var VmSupplement = {
 
 		// 初始化 车辆品牌 列表
 		this.initCarBrand();
+	},
+
+	destroyed: function destroyed() {
+		// 销毁键盘
+		this.myCarKeyBoard = '';
+		document.getElementById('ycpd-carplateid-carkeyboard').remove(); // 因为每次实例都会生成, 所以需要手动销毁
 	},
 
 	methods: {
@@ -1241,7 +1310,7 @@ var VmSupplement = {
 			// 表单校验
 			var myVerifyAll = this.verifyAll();
 			if (myVerifyAll.result !== 1) {
-				alert(myVerifyAll.message);
+				return alert(myVerifyAll.message);
 			}
 
 			// 判断页面状态
@@ -1258,6 +1327,36 @@ var VmSupplement = {
 				}, function (error) {
 					alert('注册失败, 原因:' + error);
 				})
+			} else if (this.pageType === 'editor') { // 编辑状态
+				ajaxs.saveCar(
+					this.$route.query.CarID, // 车唯一标识
+					this.carNoProvince + this.plateNo, // 车牌号
+					this.platVin, // 车架号
+					this.carBrand, // 品牌
+					this.carSeries, // 型号
+					this.carYears, // 年份
+					this.carYearModel, // 车辆具体型号
+					this.isDefaultSetting, // 是否默认车辆
+				).then(function () {
+					window.history.back(-1);
+				}, function (error) {
+					alert(error);
+				});
+			} else if (this.pageType === 'creater') { // 新增状态
+				ajaxs.saveCar(
+					false, // 车唯一标识 false 表示新增
+					this.carNoProvince + this.plateNo, // 车牌号
+					this.platVin, // 车架号
+					this.carBrand, // 品牌
+					this.carSeries, // 型号
+					this.carYears, // 年份
+					this.carYearModel, // 车辆具体型号
+					this.isDefaultSetting, // 是否默认车辆
+				).then(function () {
+					window.history.back(-1);
+				}, function (error) {
+					alert(error);
+				});
 			}
 		},
 
