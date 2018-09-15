@@ -42,6 +42,9 @@ var config = (function () { // 匿名函数自执行
 				
 				// 添加/编辑车主汽车
 				saveCar: 'http://api.demo.hotgz.com/Customer/SaveCar',
+
+				// 删除车主汽车
+				deleteCar: 'http://api.demo.hotgz.com/Customer/DeleteCar',
 			}
 		}
 
@@ -78,6 +81,9 @@ var config = (function () { // 匿名函数自执行
 				
 				// 添加/编辑车主汽车
 				saveCar: 'http://ycpdapi.hotgz.com/Customer/SaveCar',
+
+				// 删除车主汽车
+				deleteCar: 'http://ycpdapi.hotgz.com/Customer/DeleteCar',
 			}
 		}
 	}
@@ -513,6 +519,39 @@ var ajaxs = {
 	},
 
     /**
+     * 删除 车主汽车
+	 * @param {String} CarID 车唯一标识
+     */
+	deleteCar: function deleteCar(CarID) {
+
+		Vue.prototype.$indicator.open('正在提交数据...');
+
+		return new Promise(function (resolve, reject) {
+			$.ajax({
+				url: config.url.deleteCar,
+				type: "POST",
+				dataType : 'json',
+				data: {
+					CarID: CarID,
+				},
+				success: function(res){
+					Vue.prototype.$indicator.close();
+					if (res && res.Code === 200 && res.Msg === '') {
+						resolve(res);
+					} else {
+						reject('删除车辆信息失败，原因:' + res.Msg);
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					Vue.prototype.$indicator.close();
+					reject('向服务器发起请求车主删除车辆信息失败, 原因: ' + errorThrown);
+				}
+			});
+		});
+
+	},
+
+    /**
      * 获取人机验证码
      */
 	getMachineCode: function getMachineCode() {
@@ -887,31 +926,41 @@ var VmMyCar = {
 	},
 
 	mounted: function mounted() {
-		var _this = this;
 		ajaxs.customerid = this.$route.params.customerid;
-
-		ajaxs.getCarList()
-		.then(function (carList) {
-			// 判断数据是否为空
-			if (carList.length > 0) {
-				_this.carList = carList.map(function (item, key) {
-					return {
-						nativeData: JSON.parse(JSON.stringify(item)),
-						carNo: item.CarNo, // 车牌号
-						carType: item.Model + item.Brand, // 车辆类型
-						isDefault: (item.IsDefault === 1), // 1为默认车辆 0为非默认车辆
-					}
-				});
-			} else {
-				// 否则跳转到新增车辆信息页面
-				_this.jumpToCreater();
-			}
-		}, function (error) {
-			alert(error);
-		});
+		this.getCarList();
 	},
 
 	methods: {
+		/**
+		 * 获取车辆信息
+		 */
+		getCarList: function getCarList() {
+			var _this = this;
+
+			ajaxs.getCarList()
+			.then(function (carList) {
+				// 判断数据是否为空
+				if (carList.length > 0) {
+					_this.carList = carList.map(function (item, key) {
+						return {
+							nativeData: JSON.parse(JSON.stringify(item)),
+							CarID: item.CarID, // 车唯一标识
+							carNo: item.CarNo, // 车牌号
+							carType: item.Model + item.Brand, // 车辆类型
+							isDefault: (item.IsDefault === 1), // 1为默认车辆 0为非默认车辆
+							delBtnVisible: false, // 是否显示删除按钮
+						}
+					});
+				} else {
+					// 否则跳转到新增车辆信息页面
+					_this.jumpToCreater();
+				}
+			}, function (error) {
+				alert(error);
+			});
+
+		},
+
 		/**
 		 * 编辑 车辆信息
 		 * @param {Object} nativeData 原始数据
@@ -926,6 +975,53 @@ var VmMyCar = {
 		 */
 		jumpToCreater: function jumpToCreater() {
 			this.$router.push({ path: '/supplement/creater' });
+		},
+
+		/**
+		 * 删除 车辆信息
+		 * @param {String} CarID 车唯一标识
+		 */
+		deleteItem: function deleteItem(CarID) {
+			var _this = this;
+
+			if (confirm("确认要删除吗?")) {
+				ajaxs.deleteCar(CarID)
+				.then(function () {
+					// 删除成功, 再次获取一一次车辆信息
+					_this.getCarList();
+				}, function (error) {
+					alert(error);
+				});
+			}
+		},
+
+		/**
+		 * 开始触摸车辆列表 (用于删除)
+		 */
+		itemTouchStart: function itemTouchStart(item, key, startEvent) {
+			var _this = this;
+			var touchStartX = startEvent.touches[0].pageX; // 开始触摸的位置
+
+			function handleTouchMove(event) {
+				var currentX = event.touches[0].pageX; // 每次 触摸 X距离
+				var interval = currentX - touchStartX; // 每次 触摸 间隔
+				
+				// 判断是否显示
+				if (interval < -100 && item.delBtnVisible === false) { // 显示删除按钮
+					_this.carList[key].delBtnVisible = true;
+				} else if (interval > 100 && item.delBtnVisible) { // 隐藏删除按钮
+					_this.carList[key].delBtnVisible = false;
+				}
+				startEvent.preventDefault();
+			}
+
+			function handleTouchEnd() {
+				window.removeEventListener('touchmove', handleTouchMove);
+				window.removeEventListener('touchend', handleTouchEnd);
+			}
+
+            window.addEventListener('touchmove', handleTouchMove);
+            window.addEventListener('touchend', handleTouchEnd);
 		},
 	}
 }

@@ -258,28 +258,76 @@
         padding-top: 5px;
         padding-bottom: 75px;
 
-        // 框架
-        .mycar-list-item {
+        // 项复用部分
+        .list-item {
+            position: relative;
             padding-top: 5px;
             font-size: 14px;
             color: @black2;
+            overflow: hidden;
+        }
         
-            .list-item-content {
-                background: #fff;
-                padding: 15px;
+        // 滑动区域
+        .list-item-slide {
+            position: relative;
+            width: 100%;
+            left: 0px;
+            background: #fff;
+
+            transition: left 0.2s;
+            -moz-transition: left 0.2s;	/* Firefox 4 */
+            -webkit-transition: left 0.2s;	/* Safari 和 Chrome */
+            -o-transition: left 0.2s;	/* Opera */
+        }
+
+        // 滑动
+        .item-slide-left {
+            left: -120px;
+        }
+        
+        // 内容区域
+        .list-item-main {
+            padding-left: 15px;
+            padding-bottom: 15px;
+            padding-top: 15px;
+
+            .list-item-titile {
+                font-family: '微软雅黑';
+                padding-bottom: 2.5px;
+                color: @black1;
             }
         }
 
-        .list-item-titile {
-            font-family: '微软雅黑';
-            padding-bottom: 2.5px;
-            color: @black1;
+        // 右箭头
+        .list-item-icon {
+            padding-right: 15px;
+
+            .list-item-lable {
+                color: @black3;
+            }
+        }
+        
+        // 删除
+        .list-item-delete {
+            position: absolute;
+            top: 5px;
+            width: 120px;
+            height: 100%;
+            right: -120px;
+            font-size: 14px;
+            color: #fff;
+            background: #ff1d1d;
+            text-align: center;
+
+            transition: right 0.2s;
+            -moz-transition: right 0.2s;	/* Firefox 4 */
+            -webkit-transition: right 0.2s;	/* Safari 和 Chrome */
+            -o-transition: right 0.2s;	/* Opera */
         }
 
-        .list-item-lable {
-            color: @black3;
+        .item-delete-show {
+            right: 0px;
         }
-
     }
 
     // 车辆信息 新增

@@ -324,12 +324,16 @@
     <!-- 车辆信息 列表 -->
     <div class="mycar-list">
         <div class="mycar-list-content">
-            <div class="mycar-list-item"
+
+            <div class="list-item"
                 v-for="(item, key) in carList" 
-                :key="key"
-                @click="jumpToEditor(item.nativeData)"
+                :key="'00' + key"
+                @touchstart="itemTouchStart(item, key, $event)"
             >
-                <div class="list-item-content flex-start-center">
+                <div class="list-item-slide flex-start-center"
+                    :class="{'item-slide-left' : item.delBtnVisible}"
+                    @click="jumpToEditor(item.nativeData)"
+                >
                     <div class="list-item-main flex-rest">
                         <div class="list-item-titile">{{item.carNo}}</div>
                         <div class="list-item-lable">{{item.carType}}</div>
@@ -341,6 +345,10 @@
                         </svg>
                     </div>
                 </div>
+                <div class="list-item-delete flex-center" 
+                    :class="{'item-delete-show' : item.delBtnVisible}"
+                    @click="deleteItem(item.CarID)"
+                ><div>删除</div></div>
             </div>
         </div>
     </div>
