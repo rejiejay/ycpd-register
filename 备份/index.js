@@ -695,7 +695,7 @@ var wxLocation = {
 			 * @return {String} 裁剪后的文字
 			 */
 			function sliceLastIndexOfBy (string, match) {
-				let stringOfMatch= string.indexOf(match);
+				var stringOfMatch = string.indexOf(match);
 				if (stringOfMatch !== -1) {
 					return string.slice(0, stringOfMatch);
 				} else {
