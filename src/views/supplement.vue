@@ -310,6 +310,7 @@ export default {
     },
 
 	mounted: function mounted() {
+        console.log(this.userinfo)
 		var _this = this;
 		
 		// 页面状态 初始化
@@ -670,7 +671,7 @@ export default {
 		 * 暂不添加
 		 */
 		notToRegister: function notToRegister() {
-			ajaxs.register()
+			ajaxs.register(this.userinfo)
 			.then(function () {
 				window.history.back(-1);
 			}, function (error) {

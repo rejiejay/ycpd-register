@@ -4,9 +4,10 @@ import { Indicator } from 'mint-ui';
 export default {
     /**
      * 获取人机验证码
+	 * @param {String} OpenID 用户唯一ID
      */
-	getMachineCode: function getMachineCode() {
-		return config.url.getMachineCode + '?openid=' + this.OpenID + '&id=' + Math.floor(Math.random() * 1000);
+	getMachineCode: function getMachineCode(OpenID) {
+		return config.url.getMachineCode + '?openid=' + OpenID + '&id=' + Math.floor(Math.random() * 1000);
     },
     
     /**
@@ -40,6 +41,29 @@ export default {
 				error: function (XMLHttpRequest, textStatus, errorThrown) {
 					Indicator.close();
 					reject('向服务器发起请求短信验证码失败, 原因: ' + errorThrown);
+				}
+			});
+		});
+	},
+
+    /**
+     * 校验手机与短信验证码是否正确
+	 * @param {String} phoneValue 手机号码
+	 * @param {String} verifyNumber 短信验证码
+     */
+	verifyMobileCodeNumber: function verifyMobileCodeNumber(phoneValue, verifyNumber) {
+		Indicator.open('正在加载数据...');
+		
+		return new Promise(function (resolve, reject) {
+			$.get(config.url.checkVerifyCode, {
+				mobile: phoneValue, // 手机号码
+				code: verifyNumber // 短信验证码
+			}, function(response, status, xhr) {
+				Indicator.close();
+				if (response && response.Code === 200 && response.Msg === '') {
+					resolve();
+				} else {
+					reject('短信验证码错误！');
 				}
 			});
 		});

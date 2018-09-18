@@ -176,7 +176,7 @@ export default {
 		 * 渲染验证码
 		 */
 		renderBase64MachineNumber: function renderBase64MachineNumber() {
-			this.$refs.base64MachineNumber.src = ajaxs.getMachineCode();
+			this.$refs.base64MachineNumber.src = ajaxs.getMachineCode(this.$route.params.openid);
 		},
 
 		/**
@@ -244,7 +244,7 @@ export default {
 			.then(function () {
                 _this.$store.commit('initPhone', { // 存储数据到 vuex (全局)
                     mobile: _this.phoneValue,
-                    verifyCode: _this.verifyCode,
+                    verifyCode: _this.verifyNumber,
                 });
                 
 				_this.$router.replace({ path: '/supplement/register' });

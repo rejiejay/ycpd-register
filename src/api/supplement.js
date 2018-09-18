@@ -183,10 +183,10 @@ export default {
 	 * @param {String} Years 年份
 	 * @param {String} Model 车型
 	 * 
-	 * @param {String} userinfo.City 所在城市
-	 * @param {String} userinfo.OpenID 用户标识
-	 * @param {String} userinfo.Mobile 手机号码
-	 * @param {String} userinfo.VerifyCode 手机验证码
+	 * @param {String} userinfo.city 所在城市
+	 * @param {String} userinfo.openid 用户标识
+	 * @param {String} userinfo.mobile 手机号码
+	 * @param {String} userinfo.verifyCode 手机验证码
      */
 	register: function register(userinfo, CarNo, VinNo, Brand, Series, Years, Model) {
 		var OpenID = userinfo.openid;
@@ -222,7 +222,7 @@ export default {
 				data: submitData,
 				success: function(res){
 					Indicator.close();
-					if (res && res.Code === 200) {
+					if (res && res.Code === 200 && res.Msg === '') {
 						resolve(res);
 					} else {
 						reject('注册失败，原因:' + res.Msg);
@@ -279,7 +279,7 @@ export default {
 				data: submitData,
 				success: function(res){
 					Indicator.close();
-					if (res && res.Code === 200) {
+					if (res && res.Code === 200 && res.Msg === '') {
 						resolve(res);
 					} else {
 						reject('添加/编辑失败，原因:' + res.Msg);
