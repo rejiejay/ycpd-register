@@ -37,6 +37,7 @@
                     <input class="flex-rest" v-model="machineNumber" placeholder="输入4位手机验证码" />
                     <div class="flex-center" @click="renderBase64MachineNumber"><img ref="base64MachineNumber" src="" /></div>
                 </div>
+                <div class="modal-main-error" v-if="machineNumberErrorMsg !== ''">{{machineNumberErrorMsg}}</div>
                 
                 <div class="main-confirm-content">
                     <div class="modal-main-confirm" @click="checkVerifyCode">确认</div>
@@ -73,6 +74,7 @@
 
 import ajaxs from "@/api/register";
 import Consequencer from "@/utils/Consequencer";
+import wxLocation from "@/components/wxLocation";
 
 export default {
     name: 'register',
@@ -89,6 +91,8 @@ export default {
 
 			// 人机验证码
 			machineNumber: '',
+            
+			machineNumberErrorMsg: '', // 人机验证码错误信息
 
 			// 验证号码
 			verifyNumber: '',
@@ -117,7 +121,17 @@ export default {
                 _this.$store.commit('initCity', cityName); // 设置到 vuex
 			});
 		});
-	},
+    },
+    
+    watch: {
+        /**
+         * 监听输入验证码
+         * 则将错误信息清空
+         */
+        machineNumber: function () {
+            this.machineNumberErrorMsg = '';
+        }
+    },
 
     destroyed: function () {
 		window.removeEventListener('scroll', this.scrollBottom); // 移除滚动事件，检测滚动到页面底部
@@ -175,7 +189,7 @@ export default {
 				return alert('请输入正确验证码');
 			}
 
-			// // 图形验证码移动的距离 暂时为零
+			// 图形验证码移动的距离 暂时为零
 			ajaxs.getMobileCode(this.phoneValue, this.machineNumber, this.$route.params.openid)
 			.then(function () {
 				_this.isVerifyGeting = true; // 表示正在获取
@@ -193,7 +207,7 @@ export default {
 					})(i);
 				}
 			}, function (error) {
-				alert(error);
+                _this.machineNumberErrorMsg = error;
 			}); 
 		},
 
@@ -368,6 +382,7 @@ export default {
         color: @black1;
     }
 
+    // 输入
     .modal-main-input {
         padding-left: 15px;
         padding-right: 15px;
@@ -394,6 +409,13 @@ export default {
         input:-ms-input-placeholder { /* Internet Explorer 10-11 */ 
             color: @black1;
         }
+    }
+
+    // 错误信息
+    .modal-main-error {
+        padding: 15px 15px 0px 15px;
+        font-size: 14px;
+        color: #F56C6C;
     }
 
     // 确认按钮

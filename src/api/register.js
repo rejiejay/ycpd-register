@@ -34,7 +34,7 @@ export default {
 					if (res && res.Code === 200 && res.Msg === '') {
 						resolve(res);
 					} else {
-						reject('向服务器发起请求短信验证码成功, 但是' + res.Msg);
+						reject(res.Msg);
 					}
 				},
 				error: function (XMLHttpRequest, textStatus, errorThrown) {
