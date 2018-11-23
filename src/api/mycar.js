@@ -14,7 +14,7 @@ export default {
 			$.get(config.url.getCarList, {CustomerID: customerid}, function(response, status, xhr) {
 				Indicator.close();
 
-				if (response && response.Code === 200 && response.Data instanceof Array) {
+				if (response.Code === 200) {
 					resolve(response.Data);
 				} else {
 					reject('获取车主的车辆信息失败, 原因: ' + response.Msg);
@@ -27,7 +27,7 @@ export default {
      * 删除 车主汽车
 	 * @param {String} CarID 车唯一标识
      */
-	deleteCar: function deleteCar(CarID) {
+	deleteCar: function deleteCar(CarID, CustomerID) {
 
 		Indicator.open('正在提交数据...');
 
@@ -38,6 +38,7 @@ export default {
 				dataType : 'json',
 				data: {
 					CarID: CarID,
+					CustomerID: CustomerID
 				},
 				success: function(res){
 					Indicator.close();

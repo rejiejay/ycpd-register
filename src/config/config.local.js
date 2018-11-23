@@ -38,5 +38,8 @@ module.exports = {
 
         // 删除车主汽车
         deleteCar: 'http://api.demo.hotgz.com/Customer/DeleteCar',
+
+        // 跳转优惠加油列表
+        getStationHandler:'http://store.demo.ichebaoyang.com/wx/Handler.ashx',
     }
 };

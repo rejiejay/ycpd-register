@@ -14,7 +14,7 @@
                 <div class="register-input-item flex-start-center">
                     <div class="input-item-lable">短信验证:</div>
                     <div class="input-item-main flex-start-center flex-rest">
-                        <input v-model="verifyNumber" placeholder="输入4位手机验证码" />
+                        <input v-model="verifyNumber" maxlength="4" placeholder="输入4位手机短信验证码" />
                     </div>
                     <div class="input-item-verify">
                         <div class="item-verify-content"
@@ -26,15 +26,31 @@
             </div>
         </div>
 
-        <!-- 人机验证模态框 -->
-        <div class="machine-verify-modal flex-center" :class="{'machine-verify-show': isMachineModalShow}">
+        <!-- 【滑动拼图】人机验证模态框 -->
+        <div class="machine-verify-modal flex-center" :style="`display: ${isMachineModalShow ? 'flex' : 'none'}`">
             <div class="verify-modal-shade" @click="isMachineModalShow = false"></div>
             <div class="verify-modal-main" :style="'width: ' + (clientWidth - 30) + 'px;'">
 
                 <div class="modal-main-title">人机验证</div>
                 
                 <div class="modal-main-input flex-start-center">
-                    <input class="flex-rest" v-model="machineNumber" placeholder="输入4位手机验证码" />
+                    <div id="captcha-slider" class="captcha-slider"></div>
+                </div>
+                
+                <div class="main-confirm-content">
+                </div>
+            </div>
+        </div>
+
+        <!-- 【数字验证】人机验证模态框 -->
+        <!-- <div class="machine-verify-modal flex-center" :class="{'machine-verify-show': isMachineModalShow}">
+            <div class="verify-modal-shade" @click="isMachineModalShow = false"></div>
+            <div class="verify-modal-main" :style="'width: ' + (clientWidth - 30) + 'px;'">
+
+                <div class="modal-main-title">人机验证</div>
+                
+                <div class="modal-main-input flex-start-center">
+                    <input class="flex-rest" v-model="machineNumber" placeholder="输入右边的验证码以获取短信验证码" />
                     <div class="flex-center" @click="renderBase64MachineNumber"><img ref="base64MachineNumber" src="" /></div>
                 </div>
                 <div class="modal-main-error" v-if="machineNumberErrorMsg !== ''">{{machineNumberErrorMsg}}</div>
@@ -43,7 +59,7 @@
                     <div class="modal-main-confirm" @click="checkVerifyCode">确认</div>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- 协议 -->
         <div class="register-agreement">
@@ -108,19 +124,22 @@ export default {
         }
     },
 
+    created: function created() { 
+        // 实现本地缓存
+        if(window.localStorage.getItem('phoneValue') && window.localStorage.getItem('verifyNumber')){
+            this.verifyNumber = window.localStorage.getItem('verifyNumber')
+            this.phoneValue = window.localStorage.getItem('phoneValue')
+        }
+
+        window.localStorage.setItem('openid', this.$route.params.openid)  // 本地存储 openid， 其他地方会用到
+    },
+
 	mounted: function mounted() { 
-        var _this = this;
-		// 页面状态 初始化
-        this.$store.commit('initOpenid', this.$route.params.openid); // 设置到 vuex
-		
-		// 初始化位置信息
-		wxLocation.init()
-		.then(function(position) {
-			wxLocation.getCityName(position)
-			.then(function(cityName) {
-                _this.$store.commit('initCity', cityName); // 设置到 vuex
-			});
-		});
+        // 初始化页面数据
+        this.initPageData();
+
+        // 初始化 【滑动拼图】人机验证模态框
+        this.initCaptchaSlider();
     },
     
     watch: {
@@ -138,6 +157,44 @@ export default {
     },
 
 	methods: {
+        /**
+         * 页面初始化
+         */
+        initPageData: function initPageData() {
+            var _this = this;
+            // 页面状态 初始化
+            this.$store.commit('initOpenid', this.$route.params.openid); // 设置到 vuex
+            
+            // 初始化位置信息
+            wxLocation.init()
+            .then(function(position) {
+                wxLocation.getCityName(position)
+                .then(function(cityName) {
+                    _this.$store.commit('initCity', cityName); // 设置到 vuex
+                });
+            });
+        },
+
+        /**
+         * 初始化 【滑动拼图】人机验证模态框
+         */
+        initCaptchaSlider: function initCaptchaSlider() {
+            const _this = this;
+
+            CaptchaSlider.init({
+                id: 'captcha-slider',
+                width: 310,
+                height: 155,
+            })
+            .then(function (succeed) {
+                _this.checkVerifyCode();
+                // alert('succeed!');
+            }, function (error) {
+
+                // alert('error!');
+            });
+        },
+
 		/**
 		 * 校验手机号码
 		 */
@@ -167,8 +224,9 @@ export default {
 			// 判断是否正在获取验证码
 			if (this.isVerifyGeting === false) { // 没有获取验证码的情况
 				
-				this.isMachineModalShow = true; // 弹出模态框
-				this.renderBase64MachineNumber();
+                this.isMachineModalShow = true; // 弹出模态框
+                // 不需要生成 数字验证码
+				// this.renderBase64MachineNumber();
 			}
 		},
 
@@ -185,9 +243,9 @@ export default {
 		checkVerifyCode: function checkVerifyCode() {
 			var _this = this;
 
-			if (this.machineNumber.length !== 4) {
-				return alert('请输入正确验证码');
-			}
+			// if (this.machineNumber.length !== 4) {
+			// 	return alert('请输入正确验证码');
+			// }
 
 			// 图形验证码移动的距离 暂时为零
 			ajaxs.getMobileCode(this.phoneValue, this.machineNumber, this.$route.params.openid)
@@ -207,7 +265,8 @@ export default {
 					})(i);
 				}
 			}, function (error) {
-                _this.machineNumberErrorMsg = error;
+                alert(error);
+                // _this.machineNumberErrorMsg = error;
 			}); 
 		},
 
@@ -215,7 +274,9 @@ export default {
 		 * 跳转到 养车频道用户服务协议
 		 */
 		jumpToAgreement: function jumpToAgreement() {
-			this.$router.push({ path: '/agreement/' });
+            window.localStorage.setItem('phoneValue',this.phoneValue)
+            window.localStorage.setItem('verifyNumber',this.verifyNumber)
+			this.$router.push({ path: '/agreement/', });
 		},
 
 		/**
@@ -223,6 +284,7 @@ export default {
 		 * 并且跳转到下一页
 		 */
 		submitRegister: function submitRegister() {
+           
 			var _this = this;
 
 			// 校验手机号码
@@ -386,9 +448,9 @@ export default {
     .modal-main-input {
         padding-left: 15px;
         padding-right: 15px;
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
-        height: 45px;
+        // border-top: 1px solid #ddd;
+        // border-bottom: 1px solid #ddd;
+        min-height: 45px;
 
         input {
             line-height: 45px;

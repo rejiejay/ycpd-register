@@ -1,22 +1,13 @@
 <!-- 注册页面 -->
 <template>
 <div class="supplement">
-
+   
     <!-- 车牌号 -->
     <div class="supplement-input-list supplement-carNo">
         <div class="input-list-content">
-            <div class="input-item flex-start">
-                <div class="input-item-title">车牌号码:</div>
-                <div class="input-item-main flex-rest flex-start-center">
-                    <div class="input-item-select" @click="selectProvince">{{carNoProvince}}</div>
-                    <div class="item-rigth-icon flex-start-center">
-                        <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >
-                            <path fill="#909399" d="M325.399273 235.124364L600.157091 488.727273 325.399273 742.353455a34.909091 34.909091 0 1 0 47.36 51.316363l302.545454-279.272727a34.909091 34.909091 0 0 0 0-51.316364l-302.545454-279.272727a34.909091 34.909091 0 1 0-47.36 51.316364" p-id="1465"></path>
-                        </svg>
-                    </div>
-                    <div id="ycpd-carplateid-input" class="flex-rest"></div>
-                </div>
-            </div>
+            
+            <carNoInput ref="carNoComponent" @outPutHandle="carNoHandle" />
+
         </div>
     </div>
 
@@ -27,7 +18,7 @@
             <div class="input-item flex-start">
                 <div class="input-item-title">车架号码:</div>
                 <div class="input-item-main flex-rest flex-start-center">
-                    <input v-model="platVin" v-on:blur="platVinExchange" class="item-rigth-input" placeholder="请输入车架号码" />
+                    <input v-model="platVin" v-on:blur="platVinExchange" class="item-rigth-input"  style="text-transform: uppercase" placeholder="请输入车架号码" />
                 </div>
                 <div class="input-item-tip flex-start-center" @click="dialogTip = true;">
                     <svg t="1530501234558" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2537" xmlns:xlink="http://www.w3.org/1999/xlink" 
@@ -43,10 +34,7 @@
     
     <!-- 车辆型号 提示信息 -->
     <div class="dialog-tip flex-center" v-bind:class="{'dialog-tip-deny' : (dialogTip === false)}">
-        <div 
-            class="dialog-tip-shade"
-            @click="dialogTip = false;"
-        ></div>
+        <div class="dialog-tip-shade" @click="dialogTip = false;" ></div>
 
         <div class="dialog-tip-content">
             <div class="dialog-tip-img">
@@ -58,11 +46,11 @@
     <!-- 品牌车系年份车型等 -->
     <div class="supplement-input-list series-year-model">
         <div class="supplement-input-title">输入车架号可为您自动解析车辆型号</div>
-        <div class="input-list-content">
+        <div class="input-list-content" id="car">
 
             <!-- 品牌 -->
             <div class="input-item flex-start"
-                @click="brandModalVisible = true;"
+                @click="showBrandList"
             >
                 <div class="input-item-title">品&ensp;&ensp;&ensp;&ensp;牌:</div>
                 <div class="input-item-main flex-rest"
@@ -76,7 +64,7 @@
                     </svg>
                 </div>
             </div>
-            <div class="input-line"></div>
+            <!-- <div class="input-line"></div> -->
             
             <!-- 车系 -->
             <div class="input-item flex-start">
@@ -88,7 +76,7 @@
                 <div v-else class="input-item-main flex-rest input-item-select"
                     v-bind:class="{'item-show-placeholder' : (carSeries === '')}"
                 >
-                    <select v-model="carSeries" @click="isPlatExchange = false;">
+                    <select  v-model="carSeries" @click="isPlatExchange = false;">
                         <option value="" disabled :selected="carSeries === ''" hidden>请选择车辆车系</option>
                         <option 
                             v-for="(series, key) in seriesList" 
@@ -103,7 +91,7 @@
                     </svg>
                 </div>
             </div>
-            <div class="input-line"></div>
+            <!-- <div class="input-line"></div> -->
             
             <!-- 年份 -->
             <div class="input-item flex-start">
@@ -130,7 +118,7 @@
                     </svg>
                 </div>
             </div>
-            <div class="input-line"></div>
+            <!-- <div class="input-line"></div> -->
             
             <!-- 车型 -->
             <div class="input-item flex-start">
@@ -163,10 +151,17 @@
     <!-- 择车辆品牌模态框 -->
     <div class="car-brand-modal" v-if="brandModalVisible">
         <!-- 头部 -->
-        <mt-header title="择车辆品牌">
-            <div slot="left" @click="brandModalVisible = false;"><i class="mintui mintui-back"></i></div>
-        </mt-header>
-
+         <div id="listTop"></div>
+         <!-- 搜索框 -->
+        <form id="search_box" action="javascript:return true;">
+           <input id="myinput" type="search" v-model="searchName"  @keyup.13="search()" ref="input1" placeholder="输入关键字搜索">
+           <img class="icon_search" src="../assets/img/icon_search@2x.png">
+        </form>
+        <!-- <mt-header title="择车辆品牌">
+          
+        </mt-header> -->
+        <img  @click="hidebrandModalVisible" id="back" src="../assets/img/返回@2x.png" alt="">
+        <img @click="goTop" id="goTop" src="../assets/img/top@2x.png" alt="">
         <!-- 选择列表 -->
         <div class="brand-modal-group"
             v-for="(group, groupKey) in brandGroup" 
@@ -195,15 +190,14 @@
         </div>
     </div>
 
-    <!-- 是否为默认车辆 
-    如果是注册流程, 则不渲染这个按钮 -->
+    <!-- 是否为默认车辆  如果是注册流程, 则不渲染这个按钮 -->
     <div class="is-setting-default" v-if="pageType !== 'register'">
         <div class="setting-default-content flex-start-center">
-            <div class="setting-default-main flex-rest">是否设为默认车辆</div>
+            <div  id="cesi" class="setting-default-main flex-rest">是否设为默认车辆</div>
             <span>{{isDefaultSetting ? '是' : '否'}}</span>
             <div class="setting-default-switch">
                 <label for="switch-cp" class="weui-switch-cp">
-                    <input v-model="isDefaultSetting" id="switch-cp" ref="settingDefault" class="weui-switch-cp__input" type="checkbox">
+                    <input :disabled='isDefaultDisabled' v-model="isDefaultSetting" id="switch-cp" ref="settingDefault" class="weui-switch-cp__input" type="checkbox">
                     <div class="weui-switch-cp__box"></div>
                 </label>
             </div>
@@ -225,11 +219,21 @@
 
 <script>
 
+// 框架类
+import { Toast } from 'mint-ui'
+// 配置类
+import config from '@/config/index.js'
+// 请求类
 import ajaxs from "@/api/supplement";
-import Consequencer from "@/utils/Consequencer";
+// 自定义组件类
+import Consequencer from "@/utils/Consequencer";2
+import html5WxBMapLocation from "@/components/html5WxBMapLocation.js";
+import carNoInput from "@/components/carNoInput";
 
 export default {
-	template: '#supplement',
+    name: 'supplement',
+
+    components: { carNoInput },
 
 	data: function data() {
 		return {
@@ -244,6 +248,14 @@ export default {
 			/**
 			 * 车牌 与 省份
 			 */
+            carNoComponents: { // 车牌组件来的数据
+                verify: false,
+                message: '',
+                carNo: '粤',
+                carNoProvince: '粤',
+                plateNo: '',
+                carType: '',
+            },
 			carNoProvince: '粤', // 车牌号省份
 			plateNo: '',  // 车牌号码
 			myCarKeyBoard: function () {}, // 实例 (车牌选择)
@@ -296,9 +308,13 @@ export default {
 			/**
 			 * 是否设为默认车辆
 			 */ 
-			isDefaultSetting: false,
+            isDefaultSetting: true,
+            isDefaultDisabled: false, // 是否可以修改默认车辆， 有些情况是不可修改的，例如只有一辆的情况下
+
+            //搜索名
+            searchName:''
 		}
-	},
+    },
 
     computed: {
         /**
@@ -310,7 +326,7 @@ export default {
     },
 
 	mounted: function mounted() {
-        console.log(this.userinfo)
+        // console.log(this.userinfo)
 		var _this = this;
 		
 		// 页面状态 初始化
@@ -318,16 +334,12 @@ export default {
 
 		// 判断 页面是否 编辑状态
 		if (this.pageType === 'editor') {
-			// 如果是编辑状态, 初始化页面数据
+            
+            // 如果是编辑状态, 初始化页面数据
 			var query = this.$route.query;
 
-			this.carNoProvince = query.CarNo.slice(0,1); // 车牌号省份
-
-			this.plateNo = query.CarNo.slice(1); // 车牌号码	
-			this.myCarKeyBoard = new CarKeyBoard({ // 实例化 车牌选择, 并且把 车牌号码 带进去
-				bindInputDom: 'ycpd-carplateid-input',
-				plateNo: this.plateNo,
-			});
+            // 初始化 车牌组件的车牌号
+			this.$refs.carNoComponent.initPlateNoHandle(query.CarNo);
 
 			this.platVin = query.VIN; // 车架号码
 			
@@ -345,39 +357,44 @@ export default {
 			this.initCarYears(query.Series, query.Years);
 			
 			// 选择中的车辆具体型号
-			this.carYearModel = query.Series; 
-			this.initCarYearModel(query.Series, query.Years, query.Series);
-
-			this.isDefaultSetting = (query.IsDefault === 1);
-		} else {
-			// 实例化 车牌选择
-			this.myCarKeyBoard = new CarKeyBoard({
-				bindInputDom: 'ycpd-carplateid-input'
-			});
+			this.carYearModel = query.Model; 
+            this.initCarYearModel(query.Series, query.Years, query.Model);
+            
+            // 设置默认车辆
+            this.isDefaultSetting = (query.IsDefault === 1);
+            // 判断是否可以修改默认车辆
+            if ( query.IsDefault == '1' ) {
+                this.isDefaultDisabled = true;
+            }
 		}
-
-		// 绑定 车牌号码输入
-        this.myCarKeyBoard.succeedHandle(function (result) {
-            _this.plateNo = result;
-		});
-
-		// 初始化 车辆品牌 列表
-		this.initCarBrand();
-	},
-
-	destroyed: function destroyed() {
-		// 销毁键盘
-		this.myCarKeyBoard = '';
-		document.getElementById('ycpd-carplateid-carkeyboard').remove(); // 因为每次实例都会生成, 所以需要手动销毁
 	},
 
 	methods: {
+        /**
+         * 弹出车型品牌列表 模态框
+         */
+        showBrandList: function showBrandList() {
+            this.brandModalVisible = true;
+            // 初始化 车辆品牌 列表
+            this.initCarBrand();
+        },
+
+        /**
+         * 隐藏车型品牌列表 模态框
+         */
+        hidebrandModalVisible: function hidebrandModalVisible() {
+            this.brandModalVisible = false;
+            this.searchName = '';
+            this.initCarBrand();
+        },
+
 		/**
 		 * 初始化 车辆品牌 列表
 		 */
 		initCarBrand: function initCarBrand() {
             var _this = this;
-			ajaxs.getBrand()
+
+			ajaxs.getBrand(this.searchName)
 			.then(function (brandGroup) {
 				_this.brandGroup = brandGroup.map(function (brand) {
 					return {
@@ -386,9 +403,17 @@ export default {
 					}
 				});
 			}, function (error) {
-				alert(error);
+				Toast({ message: error, duration: 1500 });
+                _this.brandGroup = [];
 			});
-		},
+        },
+        
+        /**
+         * 从车牌输入的组件获取车牌号
+         */
+        carNoHandle: function carNoHandle(data) {
+            this.carNoComponents = data;
+        },
 
 		/**
 		 * 初始化 品牌 车系列表
@@ -482,27 +507,13 @@ export default {
 		},
 
 		/**
-		 * 选择车牌省份
-		 */
-		selectProvince: function selectProvince() {
-            var _this = this;
-
-            this.myCarKeyBoard.showProvincesKeyboard()
-            .then(function (value) {
-				_this.carNoProvince = value;
-            }, function (cancel) {
-				console.log('取消选择省份');
-            });
-		},
-
-		/**
 		 * 选择 车型品牌的型号
 		 * 并且初始化 series 车系号
 		 */
 		selectCarBrand: function selectCarBrand(item) {
 
 			this.brandModalVisible = false; // 模态框 隐藏
-			this.carBrand = item; // 设置为选中的
+            this.carBrand = item; // 设置为选中的
 
 			/**
 			 * 清空数据
@@ -515,7 +526,7 @@ export default {
 			this.yearModelList = [];
 
 			this.initCarSeries(item); // 初始化 品牌 车系列表
-		},
+        },
 
 		/**
 		 * 品牌车系年份车型 提示 选择顺序
@@ -540,28 +551,38 @@ export default {
 		 */
 		platVinExchange: function platVinExchange() {
 			var _this = this;
-
+           
 			// 十七个英数组成, 英文字母“I”、“O”、“Q”均不会被使用
 			if (this.platVin.length ===  17) {
-				
+				this.carSeries = '';
+                this.seriesList = [];
+                this.carYears = '';
+                this.yearsList = [];
+                this.carYearModel = '';
+                this.yearModelList = [];
+
 				ajaxs.getCarModelByVin(this.platVin) // 查询失败不做处理
 				.then(function (carInfor) {
-					_this.isPlatExchange = true; // 表示交换操作
+                    if(carInfor.Matching=='True'){
+                        _this.isPlatExchange = true; // 表示交换操作
 					
-					// 选择中的车辆品牌
-					_this.carBrand = carInfor.Brand; 
+                        // 选择中的车辆品牌
+                        _this.carBrand = carInfor.Brand; 
 
-					// 选择中的车型品牌的型号
-					_this.carSeries = carInfor.Series; 
-					_this.initCarSeries(carInfor.Brand, carInfor.Series);
-					
-					// 选择中的车型年份
-					_this.carYears = carInfor.ListingYear; 
-					_this.initCarYears(carInfor.Series, carInfor.ListingYear);
-					
-					// 选择中的车辆具体型号
-					_this.carYearModel = carInfor.SalesName; 
-					_this.initCarYearModel(carInfor.Series, carInfor.ListingYear, carInfor.SalesName);
+                        // 选择中的车型品牌的型号
+                        _this.carSeries = carInfor.Series; 
+                        _this.initCarSeries(carInfor.Brand, carInfor.Series);
+                        
+                        // 选择中的车型年份
+                        _this.carYears = carInfor.ListingYear; 
+                        _this.initCarYears(carInfor.Series, carInfor.ListingYear);
+                        
+                        // 选择中的车辆具体型号
+                        _this.carYearModel = carInfor.SalesName; 
+                        _this.initCarYearModel(carInfor.Series, carInfor.ListingYear, carInfor.SalesName);
+                    } else {
+                        return alert('解析出现错误, 请手动选择!');
+                    }
 				});
 			}
 		},
@@ -571,18 +592,21 @@ export default {
 		 */
 		verifyAll: function verifyAll() {
 			// 校验车牌 省份
-			if (this.plateNo.length === '') {
-				return Consequencer.error('车牌号码不能为空!');
-			} else if (this.plateNo.length < 5 && this.plateNo.length > 6) {
-				return Consequencer.error('车牌号码有误!');
-			}
+			// if (this.plateNo.length === 0) {
+			// 	return Consequencer.error('车牌号码不能为空!');
+			// } else if (this.plateNo.length < 5 && this.plateNo.length > 6) {
+			// 	return Consequencer.error('车牌号码有误!');
+			// }
 
-			// 校验车架号码
-			if (this.platVin.length ===  '') {
-				return Consequencer.error('车架号码不能为空!');
-			} else if (this.platVin.length !==  17) {
-				return Consequencer.error('车架号码有误!');
-			}
+			// // 校验车架号码
+		    // if (this.platVin.length !==  17) {
+			// 	return Consequencer.error('车架号码有误!');
+            // }
+
+            // 校验车牌号码 组件已经校验好了
+            if (this.carNoComponents.verify === false) {
+                return Consequencer.error(this.carNoComponents.message);
+            }
 			
 			// 校验 车辆品牌
 			if (this.carBrand === '') {
@@ -605,30 +629,37 @@ export default {
 			}
 
 			return Consequencer.success();
-		},
+        },
 
 		/**
 		 * 注册提交按钮
 		 */
 		registerSubmit: function registerSubmit() {
+            let _this = this;
+
 			// 表单校验
 			var myVerifyAll = this.verifyAll();
 			if (myVerifyAll.result !== 1) {
 				return alert(myVerifyAll.message);
-			}
+            }
 
+            if (this.platVin && this.platVin.length!==17) {
+				return ('车架号码有误!');
+            }
+            
 			// 判断页面状态
 			if (this.pageType === 'register') { // 注册状态
 				ajaxs.register(
                     this.userinfo,
-					this.carNoProvince + this.plateNo, // 车牌号
+					this.carNoComponents.plateNo, // 车牌号
 					this.platVin, // 车架号
 					this.carBrand, // 品牌
 					this.carSeries, // 型号
 					this.carYears, // 年份
-					this.carYearModel // 车辆具体型号
+                    this.carYearModel, // 车辆具体型号
 				).then(function () {
-					window.history.back(-1);
+                    _this.jumpHandleBystaus();
+                  
 				}, function (error) {
 					alert('注册失败, 原因:' + error);
 				})
@@ -636,7 +667,7 @@ export default {
 				ajaxs.saveCar(
                     this.userinfo,
 					this.$route.query.CarID, // 车唯一标识
-					this.carNoProvince + this.plateNo, // 车牌号
+					this.carNoComponents.plateNo, // 车牌号
 					this.platVin, // 车架号
 					this.carBrand, // 品牌
 					this.carSeries, // 型号
@@ -644,7 +675,14 @@ export default {
 					this.carYearModel, // 车辆具体型号
 					this.isDefaultSetting, // 是否默认车辆
 				).then(function () {
-					window.history.back(-1);
+                    if(window.localStorage.getItem('isyuyue')=='1'){
+                        window.location.href = `../carReservation/index.html#/?carNo=${_this.carNoProvince + _this.plateNo}&brand=${_this.carBrand}&series=${_this.carSeries}&years=${_this.carYears}&model=${_this.carYearModel}&openId=${window.localStorage.getItem('openId')}&name=${window.localStorage.getItem('name')}`
+                       
+                    } else {
+                        window.history.back(-1);
+
+                    }
+				
 				}, function (error) {
 					alert(error);
 				});
@@ -652,7 +690,7 @@ export default {
 				ajaxs.saveCar(
                     this.userinfo,
 					false, // 车唯一标识 false 表示新增
-					this.carNoProvince + this.plateNo, // 车牌号
+					this.carNoComponents.plateNo, // 车牌号
 					this.platVin, // 车架号
 					this.carBrand, // 品牌
 					this.carSeries, // 型号
@@ -660,24 +698,114 @@ export default {
 					this.carYearModel, // 车辆具体型号
 					this.isDefaultSetting, // 是否默认车辆
 				).then(function () {
-					window.history.back(-1);
+					if ( window.localStorage.getItem('isyuyue') === '1' ) {
+                        window.location.href = `../carReservation/index.html#/?carNo=${_this.carNoComponents.plateNo}&brand=${_this.carBrand}&series=${_this.carSeries}&years=${_this.carYears}&model=${_this.carYearModel}&openId=${window.localStorage.getItem('openId')}&name=${window.localStorage.getItem('name')}`
+
+                    } else {
+                        window.history.back(-1);
+
+                    }
 				}, function (error) {
 					alert(error);
 				});
 			}
-		},
+        },
+        
+        /**
+         * 根据状态去跳转对应的页面
+         */
+        jumpHandleBystaus: function jumpHandleBystaus() {
+            let latitude = 114;
+            let longitude = 22.7;
+
+            /**
+             * 跳转到优惠加油页面方法
+             */
+            let jumpToGetStation = () => {
+                $.ajax({
+                    url: config.url.getStationHandler,
+                    type: "post",
+                    data: {
+                        action: "GetStation",
+                        lattude: latitude,
+                        lontude: longitude,
+                        openid: window.localStorage.getItem('openid'),
+                    },
+                    success: function(datas) {
+                        window.location.href = datas.Url;
+                    }
+                });
+            }
+
+            // 判断页面状态  根据状态去跳转对应的页面
+            if ( window.localStorage.getItem('pageType') === 'piccPage' || window.localStorage.getItem('pageType') === '人保' ) {
+                window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.getItem('openid')}&name=人保`;
+
+            } else if ( window.localStorage.getItem('pageType') === '平安' ) {
+                window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.getItem('openid')}&name=平安`;
+
+            } else if ( window.localStorage.getItem('pageType') === 'LCY' ) {
+                window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.getItem('openid')}&name=理车云`;
+
+            } else if ( window.localStorage.getItem('pageType') === 'gasStation' ) {
+
+                // 获取定位
+                if( window.localStorage.getItem('latitude') && window.localStorage.getItem('longitude') ) {
+                    latitude = window.localStorage.getItem('latitude');
+                    longitude = window.localStorage.getItem('longitude');
+                    jumpToGetStation(); // 跳转到优惠加油页面方法
+
+                } else {
+
+                    // 获取定位
+                    html5WxBMapLocation(this, true)
+                    .then(position => {
+                        latitude = position.latitude;
+                        longitude = position.longitude;
+                        jumpToGetStation(); // 跳转到优惠加油页面方法
+
+                    }, error => {
+                        // 获取定位失败，就用默认的定位跳转就好了，不需要报错
+                        jumpToGetStation(); // 跳转到优惠加油页面方法
+                    });
+                }
+
+            } else {
+                // 否则这就 哪里点的就回哪里
+                window.history.back(-1); 
+            }
+        },
+
 
 		/**
 		 * 暂不添加
 		 */
 		notToRegister: function notToRegister() {
+            const _this = this;
+
 			ajaxs.register(this.userinfo)
 			.then(function () {
-				window.history.back(-1);
+                _this.jumpHandleBystaus();
+               
 			}, function (error) {
-				alert('注册失败, 原因:' + error);
+				alert('注册失败');
 			})
-		},
+        },
+        
+        // 车辆品牌页 点击按钮回顶部
+		goTop: function goTop() {
+           let anchorElement = document.getElementById('listTop')
+            if (anchorElement) {
+                anchorElement.scrollIntoView()
+            }
+        },
+
+        // 搜索功能
+		search: function search() {
+            this.$refs.input1.blur();  //关闭键盘
+            this.initCarBrand()         //调用搜索车辆品牌功能
+           
+        },
 	},
 
 	watch: {
@@ -765,25 +893,30 @@ export default {
 .supplement-input-list {
 
     .input-list-content {
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
-        background: #fff;
+        // border-top: 1px solid #ddd;
+        // border-bottom: 1px solid #ddd;
+        background-color: #fff;
+    }
+    #car {
+       background-color: #f5f5f5;
     }
 
     // 横线
     .input-line {
         position: relative;
-        z-index: @input-line-z-index;
+        // z-index: @input-line-z-index;
         margin-left: 15px;
-        height: 1px;
+        height: 0.5px;
         background: #ddd;
     }
 
     // 项目复用
     .input-item {
         padding: 0px 15px;
-        height: 42px;
-        line-height: 42px;
+        height: 50px;
+        line-height: 50px;
+        margin-bottom:1px;
+        background-color: #fff;
     }
 
     // 标题信号
@@ -796,7 +929,7 @@ export default {
     .input-item-title {
         width: 80px;
         font-size: 14px;
-        line-height: 42px;
+        line-height: 50px;
         color: @black2;
     }
 
@@ -809,7 +942,7 @@ export default {
         width: 100%;
         border: 0px;
         outline: none;
-        line-height: 42px;
+        line-height: 50px;
         font-size: 14px;
         color: @black1;
     }
@@ -824,24 +957,28 @@ export default {
     padding-top: 10px;
 
     .input-item-select {
-        padding-right: 5px;
-        font-size: 14px;
-        line-height: 42px;
+        // padding-right: 5px;
+        font-size: 15px;
+        line-height: 50px;
+        font-weight: bold;
         color: @black1;
+        display: inline-block;
+        width:12px;
     }
 
     .item-rigth-icon {
         color: @black1;
         padding-right: 5px;
+        transform: rotate(90deg);
+        margin-top:5px;
     }
     
     .ycpd-carplateid-input {
-        line-height: 42px;
+        line-height: 50px;
         font-size: 14px;
         color: @black1;
 
         .plateid-input-content {
-            color: @black1;
             letter-spacing: 4px;
         }
     }
@@ -856,7 +993,7 @@ export default {
     }
 
     .input-item-tip {
-        height: 42px;
+        height: 47px;
     }
 }
 
@@ -912,8 +1049,8 @@ export default {
 
     // 主要部分
     .input-item-main {
-        line-height: 42px;
-        height: 42px;
+        line-height: 50px;
+        height: 50px;
     }
 
     // 向右的箭头
@@ -952,23 +1089,101 @@ export default {
 
 // 择车辆品牌模态框
 .car-brand-modal {
-    position: fixed;
+    position: absolute;
     top: 0px;
     left: 0px;
     width: 100%;
     height: 100%;
     background: #f5f5f5;
-    overflow-y: scroll;
+    // overflow-y: scroll;
     z-index: @car-brand-modal-z-index;
+    .brand-modal-group:nth-child(5) {
+        margin-top:55px;
+    }
+
+    // 搜索框
+    #search_box {
+        width: 100%;
+        position: fixed;
+        top:0px;
+        height: 55px;
+        border-bottom: 1px solid #ddd;
+        background-color: #fff;
+        z-index: 3;
+        input {
+            display: block;
+            margin:0 auto;
+            margin-top: 12px;
+            height: 34px;
+            width: 90%;
+            border: 1px solid #f5f5f5;
+            border-radius: 5px !important;
+            background-color: #f5f5f5;
+            padding-left: 55px;
+            box-sizing: border-box;
+            font-size: 14px;
+            outline: none;
+            -webkit-appearance:none !important;
+
+        }
+        input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+            color: #ccc;
+        }
+        input:-moz-placeholder, textarea:-moz-placeholder {
+            color: #ccc;
+        }
+        input::-moz-placeholder, textarea::-moz-placeholder {
+            color: #ccc;
+        }
+        input:-ms-input-placeholder, textarea:-ms-input-placeholder {
+            color: #ccc;
+        }
+        .icon_search {
+            height: 16px;
+            width: 16px;
+            position: absolute;
+            top: 21px;
+            left: 30px;
+        }
+    }
 
     // 模态框 头部
     .mint-header {
         background-color: #E50012;
+        
+    }
+    #arrow {
+        height:40px;
+        background-color: #fff;
+        line-height: 40px;
+    }
+    #goTop {
+        width:55px;
+        height:55px;
+        color:#fff;
+        line-height: 40px;
+        text-align: center;
+        position:fixed;
+        bottom:40px;
+        right:8px;
+        border-radius:20px;
+    }
+    #back {
+        width:55px;
+        height:55px;
+        color:#fff;
+        line-height: 40px;
+        text-align: center;
+        position:fixed;
+        bottom:100px;
+        right:8px;
+        border-radius:20px;
     }
 
     // 模态框 组
     .brand-modal-group {
         .modal-group-title {
+            background-color: #f5f5f5 !important;
             padding-left: 15px;
             height: 40px;
             line-height: 40px;
@@ -979,8 +1194,8 @@ export default {
     // 模态框 列表
     .modal-group-list {
         background: #fff;
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
+        border-top: 0.5px solid #ddd;
+        border-bottom: 0.5px solid #ddd;
 
         .group-list-content {
             padding-left: 15px;
@@ -993,7 +1208,7 @@ export default {
         }
 
         .item-bottom-line {
-            border-bottom: 1px solid #ddd;
+            border-bottom: 0.5px solid #ddd;
         }
     }
 }
@@ -1005,11 +1220,11 @@ export default {
     // 整体框架部分
     .setting-default-content {
         padding: 0px 15px;
-        height: 45px;
-        line-height: 45px;
+        height: 50px;
+        line-height: 50px;
         font-size: 14px;
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
+        // border-top: 1px solid #ddd;
+        // border-bottom: 1px solid #ddd;
         background-color: #fff;
     }
 

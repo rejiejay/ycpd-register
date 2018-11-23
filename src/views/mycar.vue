@@ -13,22 +13,21 @@
             >
                 <div class="list-item-slide flex-start-center"
                     :class="{'item-slide-left' : item.delBtnVisible}"
-                    @click="jumpToEditor(item.nativeData)"
+                   
                 >
-                    <div class="list-item-main flex-rest">
-                        <div class="list-item-titile">{{item.carNo}}</div>
+                    <div  @click="jumpToEditor(item.nativeData)" class="list-item-main flex-rest">
+                        <div class="list-item-titile">{{item.carNo}}
+                            <img src="../assets/img/icon_edit@2x.png" />
+                        </div>
                         <div class="list-item-lable">{{item.carType}}</div>
                     </div>
-                    <div class="list-item-icon flex-start-center">
-                        <span v-if="item.isDefault">默认</span>
-                        <svg width="18" height="18" t="1530499422424" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1464" xmlns:xlink="http://www.w3.org/1999/xlink" >
-                            <path fill="#909399" d="M325.399273 235.124364L600.157091 488.727273 325.399273 742.353455a34.909091 34.909091 0 1 0 47.36 51.316363l302.545454-279.272727a34.909091 34.909091 0 0 0 0-51.316364l-302.545454-279.272727a34.909091 34.909091 0 1 0-47.36 51.316364" p-id="1465"></path>
-                        </svg>
+                    <div @click="changeCar(item.nativeData)" class="list-item-icon" :class="[item.isDefault!='1'?'blue':'']">
+                        <span >{{item.isDefault=='1'?'已选择':'选择'}}</span>
                     </div>
                 </div>
                 <div class="list-item-delete flex-center" 
                     :class="{'item-delete-show' : item.delBtnVisible}"
-                    @click="deleteItem(item.CarID)"
+                    @click="deleteItem(item.CarID,item.isDefault)"
                 ><div>删除</div></div>
             </div>
         </div>
@@ -46,6 +45,7 @@
 <script>
 
 import ajaxs from "./../api/mycar";
+import ajaxs1 from "@/api/supplement";
 
 export default {
 	template: '#mycar',
@@ -60,14 +60,23 @@ export default {
 				// 	carType: '比亚迪-泰', // 车牌号
 				// 	isDefault: true, // 是否默认
 				// }
-			],
+            ],
+            userinfo:{
+                customerid:this.$route.params.customerid
+            }
 		}
 	},
 
 	mounted: function mounted() {
         this.$store.commit('initCustomerid', this.$route.params.customerid); // 设置到 vuex
 		this.getCarList();
-	},
+    },
+    
+	created: function created() {
+        window.localStorage.setItem('isyuyue',this.$route.params.yuyue)
+        window.localStorage.setItem('openId',this.$route.params.openId)
+        window.localStorage.setItem('name',this.$route.params.name)
+    },
 
 	methods: {
 		/**
@@ -78,27 +87,58 @@ export default {
 
 			ajaxs.getCarList(this.$route.params.customerid)
 			.then(function (carList) {
-				// 判断数据是否为空
-				if (carList.length > 0) {
-					_this.carList = carList.map(function (item, key) {
-						return {
-							nativeData: JSON.parse(JSON.stringify(item)),
-							CarID: item.CarID, // 车唯一标识
-							carNo: item.CarNo, // 车牌号
-							carType: item.Model + item.Brand, // 车辆类型
-							isDefault: (item.IsDefault === 1), // 1为默认车辆 0为非默认车辆
-							delBtnVisible: false, // 是否显示删除按钮
-						}
-					});
-				} else {
-					// 否则跳转到新增车辆信息页面
-					_this.jumpToCreater();
-				}
+                // 判断数据是否为空
+               
+                    console.log(carList.length)
+                    if (carList.length != 0) {
+                        _this.carList = carList.map(function (item, key) {
+                            return {
+                                nativeData: JSON.parse(JSON.stringify(item)),
+                                CarID: item.CarID, // 车唯一标识
+                                carNo: item.CarNo, // 车牌号
+                                carType:item.Brand +" "+ item.Model, // 车辆类型
+                                isDefault: (item.IsDefault === 1), // 1为默认车辆 0为非默认车辆
+                                delBtnVisible: false, // 是否显示删除按钮
+                            }
+                        });
+                       
+					
+				    } else {
+                        // 否则跳转到新增车辆信息页面
+			            _this.$router.replace({ path: '/supplement/creater' });
+				    }
+                
+				
 			}, function (error) {
 				alert(error);
 			});
 
 		},
+
+        // 选择车辆
+        changeCar(val) {
+            let _this = this
+            ajaxs1.saveCar(
+                _this.userinfo,
+                val.CarID, // 车唯一标识
+                val.CarNo, // 车牌号
+                val.VIN, // 车架号
+                val.Brand, // 品牌
+                val.Series, // 型号
+                val.Years, // 年份
+                val.Model, // 车辆具体型号
+                '1', // 是否默认车辆
+            )
+            .then(() => {
+                // 判断是否理车云
+                // 如果是理车云跳转的路径不一样的
+                if ( window.localStorage.getItem('isyuyue') == '1' ) {
+                    window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.getItem('openId')}&name=${window.localStorage.getItem('name')}`
+                } else {
+                    window.history.back(-1);
+                }
+            }, error => alert(error));
+        },
 
 		/**
 		 * 编辑 车辆信息
@@ -115,24 +155,29 @@ export default {
 		 */
 		jumpToCreater: function jumpToCreater() {
 			this.$router.push({ path: '/supplement/creater' });
-		},
-
+        },
+        
 		/**
 		 * 删除 车辆信息
 		 * @param {String} CarID 车唯一标识
 		 */
-		deleteItem: function deleteItem(CarID) {
+		deleteItem: function deleteItem(CarID, IsDefault) {
 			var _this = this;
-
+            
 			if (confirm("确认要删除吗?")) {
-				ajaxs.deleteCar(CarID)
-				.then(function () {
-					// 删除成功, 再次获取一一次车辆信息
-					_this.getCarList();
-				}, function (error) {
-					alert(error);
-				});
-			}
+                ajaxs.deleteCar(CarID, this.$route.params.customerid)
+                .then(function () {
+                    // 删除成功, 再次获取一一次车辆信息
+                    _this.getCarList();
+                }, function (error) {
+                    alert(error);
+                });
+                // if(IsDefault){
+                //     return alert('默认车辆不可删除')
+                // } else {
+                // }
+            }
+				
 		},
 
 		/**
@@ -223,17 +268,37 @@ export default {
             font-family: '微软雅黑';
             padding-bottom: 2.5px;
             color: @black1;
+            img {
+                width:12px;
+                height:12px;
+            }
         }
     }
 
     // 右箭头
     .list-item-icon {
-        padding-right: 15px;
-
-        .list-item-lable {
-            color: @black3;
-        }
+        height:30px;
+        width:70px;
+        border:1px solid #bbb;
+        border-radius:15px;
+        margin-right:15px;
+        text-align: center;
+        line-height: 30px;
+        background-color: #EEEEEE;
+        color:#BBBBBB;
+        
     }
+    .blue {
+            background-color: #fff;
+            color:#5594FF;
+            border:1px solid #5594FF;
+            border-radius:15px;
+            margin-right:15px;
+            text-align: center;
+            line-height: 30px;
+            height:30px;
+            width:70px;
+        }
     
     // 删除
     .list-item-delete {

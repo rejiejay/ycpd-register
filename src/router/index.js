@@ -24,7 +24,7 @@ const routes = [
      * @param {String} customerid 养车频道 用户标识 180910010001949590
      */
     {
-        path: '/mycar/:customerid',
+        path: '/mycar/:customerid/:yuyue/:openId/:name',
         component: () => import('@/views/mycar'),
         meta: { title: '我的车辆' },
     }, 
@@ -36,7 +36,7 @@ const routes = [
     {
         path: '/supplement/:pageType',
         component: () => import('@/views/supplement'),
-        meta: { title: '完善车辆信息' },
+        meta: { title: '车辆信息' },
     }
 ];
 

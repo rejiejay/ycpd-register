@@ -7,7 +7,7 @@ export default {
 	 * @param {String} OpenID 用户唯一ID
      */
 	getMachineCode: function getMachineCode(OpenID) {
-		return config.url.getMachineCode + '?openid=' + OpenID + '&id=' + Math.floor(Math.random() * 1000);
+		return `${config.url.getMachineCode}?openid=${OpenID}&id=${Math.floor(Math.random() * 1000)}`;
     },
     
     /**
@@ -26,9 +26,11 @@ export default {
 				type: "POST",
 				dataType : 'json',
 				data: {
+					CodeIs: true, // CodeIs 为true会忽略数字验证码
 					Mobile: Mobile,
 					OpenID: OpenID,
-					Code: Code,
+					// Code: Code, // 因为忽略数字验证码 所以 code 随机生成 4位小数
+					Code: Math.floor(Math.random() * 1000),
 				},
 				success: function(res){
 					Indicator.close();

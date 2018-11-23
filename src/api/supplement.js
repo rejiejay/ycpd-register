@@ -5,10 +5,11 @@ export default {
 	/**
      * 获取 车辆品牌 列表
      */
-	getBrand: function getBrand() {
+	getBrand: function getBrand(Name) {
 		return new Promise(function (resolve, reject) {
 			var form = new FormData();
 			form.append("action", "GetBrand");
+			form.append("Name", Name);
 			
 			$.ajax({
 				url: config.url.carBrandSeriesCode,
@@ -20,11 +21,11 @@ export default {
 					if (res && res instanceof Array && res.length > 0) {
 						resolve(res);
 					} else {
-						reject('向服务器发起请求查找车辆品牌列表成功, 但是数据有误!');
+						// reject('向服务器发起请求查找车辆品牌列表成功, 但是数据有误!');
 					}
 				},
 				error: function (XMLHttpRequest, textStatus, errorThrown) {
-					reject('向服务器发起请求查找车辆品牌列表失败, 原因: ' + errorThrown);
+					reject('未找到此车辆品牌');
 				}
 			});
 		});
@@ -53,12 +54,12 @@ export default {
 					if (res && res instanceof Array && res.length > 0) {
 						resolve(res);
 					} else {
-						reject('向服务器发起请求查找品牌型号成功, 但是数据有误!');
+						reject('未找到该品牌车系');
 					}
 				},
 				error: function (XMLHttpRequest, textStatus, errorThrown) {
 					Indicator.close();
-					reject('向服务器发起请求查找品牌型号失败, 原因: ' + errorThrown);
+					// reject('向服务器发起请求查找品牌型号失败, 原因: ' + errorThrown);
 				}
 			});
 		});
@@ -96,12 +97,12 @@ export default {
 						if (res && res instanceof Array && res.length > 0) {
 							resolve(res);
 						} else {
-							reject('向服务器发起请求车型年份列表成功, 但是数据有误!');
+							// reject('向服务器发起请求车型年份列表成功, 但是数据有误!');
 						}
 					},
 					error: function (XMLHttpRequest, textStatus, errorThrown) {
 						Indicator.close();
-						reject('向服务器发起请求车型年份列表失败, 原因: ' + errorThrown);
+						// reject('向服务器发起请求车型年份列表失败, 原因: ' + errorThrown);
 					}
 				});
 			});
@@ -143,12 +144,12 @@ export default {
 						if (res && res instanceof Array && res.length > 0) {
 							resolve(res);
 						} else {
-							reject('向服务器发起请求车辆具体型号列表成功, 但是数据有误!');
+							// reject('向服务器发起请求车辆具体型号列表成功, 但是数据有误!');
 						}
 					},
 					error: function (XMLHttpRequest, textStatus, errorThrown) {
 						Indicator.close();
-						reject('向服务器发起请求车辆具体型号列表失败, 原因: ' + errorThrown);
+						// reject('向服务器发起请求车辆具体型号列表失败, 原因: ' + errorThrown);
 					}
 				});
 			});
@@ -196,7 +197,7 @@ export default {
 
 		Indicator.open('正在加载数据...');
 
-		// 暂不添加的数据
+		// 暂不添加的情况
 		var submitData = {
 			OpenID: OpenID,
 			Mobile: Mobile,
@@ -205,7 +206,7 @@ export default {
 		}
 
 		// 所有信息
-		if (CarNo && VinNo && Brand && Series && Years && Model) {
+		if (CarNo && Brand && Series && Years && Model) {
 			submitData.CarNo = CarNo;
 			submitData.VinNo = VinNo;
 			submitData.Brand = Brand;
