@@ -87,9 +87,7 @@ export default {
 
 			ajaxs.getCarList(this.$route.params.customerid)
 			.then(function (carList) {
-                // 判断数据是否为空
-               
-                    console.log(carList.length)
+                    // 判断数据是否为空
                     if (carList.length != 0) {
                         _this.carList = carList.map(function (item, key) {
                             return {
@@ -101,14 +99,12 @@ export default {
                                 delBtnVisible: false, // 是否显示删除按钮
                             }
                         });
-                       
 					
 				    } else {
                         // 否则跳转到新增车辆信息页面
 			            _this.$router.replace({ path: '/supplement/creater' });
 				    }
                 
-				
 			}, function (error) {
 				alert(error);
 			});

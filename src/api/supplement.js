@@ -177,7 +177,9 @@ export default {
 
     /**
      * 车主注册
+	 * 以后不要这么传参数，传一个 对象的可控性比较高
 	 * @param {String} CarNo 车牌号
+	 * @param {String} CarType 车牌类型
 	 * @param {String} VinNo 车架号
 	 * @param {String} Brand 品牌
 	 * @param {String} Series 车系
@@ -189,7 +191,7 @@ export default {
 	 * @param {String} userinfo.mobile 手机号码
 	 * @param {String} userinfo.verifyCode 手机验证码
      */
-	register: function register(userinfo, CarNo, VinNo, Brand, Series, Years, Model) {
+	register: function register(userinfo, CarNo, CarType, VinNo, Brand, Series, Years, Model) {
 		var OpenID = userinfo.openid;
 		var Mobile = userinfo.mobile;
 		var VerifyCode = userinfo.verifyCode;
@@ -202,12 +204,13 @@ export default {
 			OpenID: OpenID,
 			Mobile: Mobile,
 			VerifyCode: VerifyCode,
-			City: City
+			City: City,
+			CarNo: CarNo, // 不管注册不注册都需要携带 车牌
+			CarType: CarType, // 不管注册不注册都需要携带 车牌
 		}
 
 		// 所有信息
 		if (CarNo && Brand && Series && Years && Model) {
-			submitData.CarNo = CarNo;
 			submitData.VinNo = VinNo;
 			submitData.Brand = Brand;
 			submitData.Series = Series;
@@ -241,6 +244,7 @@ export default {
      * 添加/编辑车主汽车
 	 * @param {String} CarID 车唯一标识 存在表示 编辑 false 表示新增
 	 * @param {String} CarNo 车牌号
+	 * @param {String} CarType 车牌类型
 	 * @param {String} VinNo 车架号
 	 * @param {String} Brand 品牌
 	 * @param {String} Series 车系
@@ -250,7 +254,7 @@ export default {
 	 * 
 	 * @param {String} userinfo.customerid 养车频道 用户标识
      */
-	saveCar: function saveCar(userinfo, CarID, CarNo, VinNo, Brand, Series, Years, Model, IsDefault) {
+	saveCar: function saveCar(userinfo, CarID, CarNo, CarType, VinNo, Brand, Series, Years, Model, IsDefault) {
 		var CustomerID = userinfo.customerid;
 
 		Indicator.open('正在提交数据...');
@@ -258,6 +262,7 @@ export default {
 		// 所有信息
 		var submitData = {
 			CarNo: CarNo,
+			CarType: CarType, // 车牌类型
 			VIN: VinNo,
 			Brand: Brand,
 			Series: Series,

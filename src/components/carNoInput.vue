@@ -277,6 +277,13 @@ export default {
         },
     },
 
+    mounted: function mounted() {
+        /**
+         * 组件初始化完成的时候，输出一次结果到父组件，否则父组件第一次校验车牌号的时候会取值空
+         */
+        this.outPutHandle();
+    },
+
 	methods: {
         /**
          * 初始化车牌号的方法
@@ -463,12 +470,8 @@ export default {
             /**
              * 子组件 在此先校验一遍 就免去了父组件的校验
              */
-
             let verify = false;
             let message = '';
-            if (this.plateNo === '') {
-                message = '车牌号为空';
-            }
 
             // 先判断是不是新能源
             if (this.carType_index === 2) {
@@ -491,6 +494,11 @@ export default {
                 } else {
                     message = '车牌号不正确';
                 }
+            }
+
+            // 最后判断为空，因为会被覆盖
+            if (this.plateNo === '') {
+                message = '车牌号不能为空';
             }
 
             this.$emit('outPutHandle', {

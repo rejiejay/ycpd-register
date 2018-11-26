@@ -258,7 +258,6 @@ export default {
             },
 			carNoProvince: '粤', // 车牌号省份
 			plateNo: '',  // 车牌号码
-			myCarKeyBoard: function () {}, // 实例 (车牌选择)
 
 			/**
 			 * 车架号码 提示信息
@@ -327,18 +326,20 @@ export default {
 
 	mounted: function mounted() {
         // console.log(this.userinfo)
-		var _this = this;
+		let _this = this;
 		
 		// 页面状态 初始化
 		this.pageType = this.$route.params.pageType;
+            
+        // 初始化页面数据
+        let query = this.$route.query;
+
 
 		// 判断 页面是否 编辑状态
 		if (this.pageType === 'editor') {
-            
-            // 如果是编辑状态, 初始化页面数据
-			var query = this.$route.query;
 
             // 初始化 车牌组件的车牌号
+            this.carNoComponents.carNo = query.CarNo;
 			this.$refs.carNoComponent.initPlateNoHandle(query.CarNo);
 
 			this.platVin = query.VIN; // 车架号码
@@ -366,7 +367,13 @@ export default {
             if ( query.IsDefault == '1' ) {
                 this.isDefaultDisabled = true;
             }
-		}
+
+        
+		} else if (this.pageType === 'register') { // 判断是否注册页面跳转进来
+            // 初始化 车牌组件的车牌号
+            this.carNoComponents.carNo = query.carNoComponents;
+			this.$refs.carNoComponent.initPlateNoHandle(query.carNoComponents);
+        }
 	},
 
 	methods: {
@@ -651,7 +658,8 @@ export default {
 			if (this.pageType === 'register') { // 注册状态
 				ajaxs.register(
                     this.userinfo,
-					this.carNoComponents.plateNo, // 车牌号
+					this.carNoComponents.carNo, // 车牌号
+					this.carNoComponents.carType, // 车牌类型
 					this.platVin, // 车架号
 					this.carBrand, // 品牌
 					this.carSeries, // 型号
@@ -667,7 +675,8 @@ export default {
 				ajaxs.saveCar(
                     this.userinfo,
 					this.$route.query.CarID, // 车唯一标识
-					this.carNoComponents.plateNo, // 车牌号
+					this.carNoComponents.carNo, // 车牌号
+                    this.carNoComponents.carType, // 车牌类型
 					this.platVin, // 车架号
 					this.carBrand, // 品牌
 					this.carSeries, // 型号
@@ -690,7 +699,8 @@ export default {
 				ajaxs.saveCar(
                     this.userinfo,
 					false, // 车唯一标识 false 表示新增
-					this.carNoComponents.plateNo, // 车牌号
+					this.carNoComponents.carNo, // 车牌号
+                    this.carNoComponents.carType, // 车牌类型
 					this.platVin, // 车架号
 					this.carBrand, // 品牌
 					this.carSeries, // 型号
@@ -783,8 +793,19 @@ export default {
 		notToRegister: function notToRegister() {
             const _this = this;
 
-			ajaxs.register(this.userinfo)
-			.then(function () {
+            // 校验车牌号码 组件已经校验好了
+            if (this.carNoComponents.verify === false) {
+				return alert(this.carNoComponents.message);
+            }
+
+			ajaxs.register(
+                this.userinfo, 
+                this.carNoComponents.carNo, // 车牌号
+                this.carNoComponents.carType, // 车牌类型
+            ).then(function () {
+                /**
+                 * 注册成功后，跳转到
+                 */
                 _this.jumpHandleBystaus();
                
 			}, function (error) {

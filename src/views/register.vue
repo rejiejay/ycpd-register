@@ -1,9 +1,21 @@
 <!-- 注册页面 -->
 <template>
     <div class="register">
+   
+        <!-- 车牌号 -->
+        <div class="register-input">
+            <div class="register-content-container" style="background: #fff;">
+                
+                <carNoInput ref="carNoComponent" @outPutHandle="carNoHandle" />
+
+            </div>
+        </div>
+
         <!-- 注册 -->
         <div class="register-input">
             <div class="register-content">
+
+                <!-- 手机号码 -->
                 <div class="register-input-item flex-start-center">
                     <div class="input-item-lable">手机号码:</div>
                     <div class="input-item-main flex-rest">
@@ -11,6 +23,8 @@
                     </div>
                 </div>
                 <div class="register-input-line"></div>
+                
+                <!-- 短信验证码 -->
                 <div class="register-input-item flex-start-center">
                     <div class="input-item-lable">短信验证:</div>
                     <div class="input-item-main flex-start-center flex-rest">
@@ -88,12 +102,17 @@
 
 <script>
 
+// 请求类
 import ajaxs from "@/api/register";
+// 自定义组件类
 import Consequencer from "@/utils/Consequencer";
 import wxLocation from "@/components/wxLocation";
+import carNoInput from "@/components/carNoInput";
 
 export default {
     name: 'register',
+
+    components: { carNoInput },
 
     data () {
         return {
@@ -107,6 +126,18 @@ export default {
 
 			// 人机验证码
 			machineNumber: '',
+
+			/**
+			 * 车牌 与 省份
+			 */
+            carNoComponents: { // 车牌组件来的数据
+                verify: false,
+                message: '',
+                carNo: '粤',
+                carNoProvince: '粤',
+                plateNo: '',
+                carType: '',
+            },
             
 			machineNumberErrorMsg: '', // 人机验证码错误信息
 
@@ -193,6 +224,13 @@ export default {
 
                 // alert('error!');
             });
+        },
+        
+        /**
+         * 从车牌输入的组件获取车牌号
+         */
+        carNoHandle: function carNoHandle(data) {
+            this.carNoComponents = data;
         },
 
 		/**
@@ -287,6 +325,11 @@ export default {
            
 			var _this = this;
 
+            // 校验车牌号码 组件已经校验好了
+            if (this.carNoComponents.verify === false) {
+				return alert(this.carNoComponents.message);
+            }
+
 			// 校验手机号码
 			if (this.verifyPhoneValue().result !== 1) {
 				return alert(this.verifyPhoneValue().message);
@@ -304,17 +347,39 @@ export default {
 
 			ajaxs.verifyMobileCodeNumber(this.phoneValue, this.verifyNumber)
 			.then(function () {
-                _this.$store.commit('initPhone', { // 存储数据到 vuex (全局)
+                /**
+                 * 存储数据到 vuex (全局)
+                 * 简单的跳转逻辑犯不着用 vuex，徒增复杂度
+                 * 直接路由带过去就行了
+                 */
+                _this.$store.commit('initPhone', { 
                     mobile: _this.phoneValue,
                     verifyCode: _this.verifyNumber,
                 });
                 
-				_this.$router.replace({ path: '/supplement/register' });
+				_this.replaceToRouter('/supplement/register', {
+                    mobile: _this.phoneValue,
+                    verifyCode: _this.verifyNumber,
+                    carNoComponents: _this.carNoComponents.carNo
+                });
 			}, function (error) {
 				alert(error);
-			})
-
+			});
 		},
+
+        /**
+         * 重定向到路由
+         * @param {object} query 携带的参数 非必填
+         */
+        replaceToRouter: function replaceToRouter(url, query) {
+            let routerConfig = {
+                path: url,
+            }
+
+            query ? routerConfig.query = query : null; // 初始化携带的参数 非必填
+
+            this.$router.replace(routerConfig);
+        },
 	},
 }
 
