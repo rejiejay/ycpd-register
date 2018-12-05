@@ -5,16 +5,16 @@
     <!-- 滑动拼图部分 -->
     <div id="captcha-slider-content" class="captcha-slider-content">
         <!-- 刷新的按钮 -->
-        <div class="captcha-slider-refresh" id="slider-refresh" :style="`left: ${sliderWidth - 23 - 15}px;`">
-            <svg width="23" height="23" t="1530243424799" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6039" xmlns:xlink="http://www.w3.org/1999/xlink" >
-                <path d="M55.935033 264.48948c0 0 85.897017-132.548409 221.81443-203.673173 135.916406-71.121743 303.368504-50.646859 413.187968 18.319527 109.819465 68.970415 146.791894 127.160016 146.791894 127.160016l94.59499-53.879895c0 0 19.576483-9.697092 19.576483 12.932142l0 338.379961c0 0 0 30.17399-22.837719 19.395191-19.210878-9.062571-226.959086-127.198289-292.424528-164.466828-35.950145-16.035251-4.365101-29.062068-4.365101-29.062068l91.284402-52.173738c0 0-52.068992-65.209619-128.278989-99.744682-81.576231-42.501826-157.948384-47.541735-251.497925-12.224097-61.002644 23.025054-132.823368 81.988166-184.553949 169.082716L55.935033 264.48948 55.935033 264.48948 55.935033 264.48948zM904.056909 711.697844c0 0-85.897017 132.550423-221.816444 203.671159-135.917413 71.12275-303.366489 50.651895-413.186961-18.315498-109.825508-68.972429-146.790886-127.165052-146.790886-127.165052L27.662591 823.768348c0 0-19.572454 9.703135-19.572454-12.932142L8.090137 472.459267c0 0 0-30.170968 22.831676-19.397205 19.211885 9.067607 226.965129 127.198289 292.430571 164.470856 35.950145 16.035251 4.366109 29.058039 4.366109 29.058039l-91.285409 52.175753c0 0 52.071006 65.206598 128.279996 99.744682 81.57321 42.498804 157.942341 47.540728 251.496918 12.222082 60.998616-23.026061 132.820346-81.983131 184.546898-169.082716L904.056909 711.697844 904.056909 711.697844 904.056909 711.697844zM904.056909 711.697844" p-id="6040" ></path>
+        <div class="captcha-slider-refresh" @click="initNumerical" :style="`left: ${sliderWidth - 23 - 15}px;`">
+            <svg width="23" height="23" t="1543993084076" viewBox="0 0 1027 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1781" xmlns:xlink="http://www.w3.org/1999/xlink" >
+                <path fill="#409EFF" d="M1020.444444 460.8 834.844444 230.4c-19.2-25.6-57.6-25.6-76.8 0L572.444444 460.8c-12.8 19.2 0 44.8 19.2 44.8l70.4 0c0 134.4 0 307.2-243.2 448-6.4 6.4 0 12.8 6.4 12.8 454.4-70.4 492.8-377.6 492.8-460.8l76.8 0C1020.444444 505.6 1033.244444 480 1020.444444 460.8L1020.444444 460.8 1020.444444 460.8zM438.044444 518.4 361.244444 518.4c0-134.4 0-307.2 243.2-448 6.4-6.4 0-12.8-6.4-12.8C143.644444 128 105.244444 435.2 105.244444 518.4L28.444444 518.4C2.844444 518.4-9.955556 544 9.244444 563.2L194.844444 793.6c19.2 25.6 57.6 25.6 76.8 0l185.6-230.4C470.044444 544 457.244444 518.4 438.044444 518.4L438.044444 518.4 438.044444 518.4z" p-id="1782"></path>
             </svg>
         </div>
 
         <canvas ref="captchasliderbackground" class="captcha-slider-background"></canvas>
         <canvas ref="captchasliderobjective" class="captcha-slider-objective captcha-slider-position"></canvas>
-        <canvas ref="captchasliderblockshadow" class="captcha-slider-blockshadow captcha-slider-position"></canvas>
-        <canvas ref="captchasliderblock" class="captcha-slider-block captcha-slider-position"></canvas>
+        <canvas ref="captchasliderblockshadow" :style="`left: ${targetLeftStyle}px`" class="captcha-slider-blockshadow captcha-slider-position"></canvas>
+        <canvas ref="captchasliderblock" :style="`left: ${targetLeftStyle}px`" class="captcha-slider-block captcha-slider-position"></canvas>
     </div>
 
     <!-- 底部拖动部分 -->
@@ -59,6 +59,8 @@ export default {
             target_x_axis: 100, // 目标位置
             matchOffset: 3, // 匹配 偏差范围
 
+            targetLeftStyle: 0,
+
             dragText: '向右滑动滑块验证',
 
             dragmaskwidth: 0,
@@ -76,7 +78,7 @@ export default {
     },
 
     mounted: function mounted() {
-        this.initCaptchaSlider(); // 初始化 整个控件
+        this.initCanvas(); // 初始化 Canvas
 
         // 初始化拖动事件
         this.initSliderDrag();
@@ -85,11 +87,37 @@ export default {
 
 	methods: {
         /**
-         * 初始化 整个控件
+         * 初始化 数值
          */
-        initCaptchaSlider: function initCaptchaSlider() {
-            this.initCanvas(); // 初始化 Canvas
-            this.initCanvasLocation(); // 绑定 Canvas 位置事件
+        initNumerical: function initNumerical() {
+            const _this = this;
+
+            this.dragHandleIcon = 'normal';
+            this.my_x_axis = 0;
+            this.draghandleleft = 0;
+            this.dragmaskwidth = 0;
+            this.targetLeftStyle = this.my_x_axis - this.target_x_axis;
+            this.dragText = '向右滑动滑块验证';
+
+            // 初始化 图片
+            let background_ctx = this.$refs.captchasliderbackground.getContext('2d');
+            let block_ctx = this.$refs.captchasliderblock.getContext('2d');
+            var imgElement = document.createElement('img');
+            imgElement.onload = function() {
+                background_ctx.drawImage(imgElement, 0, 0, _this.sliderWidth, _this.sliderHeight);
+                block_ctx.drawImage(imgElement, 0, 0, _this.sliderWidth, _this.sliderHeight);
+            };
+            imgElement.src = 'https://ycpd-assets.oss-cn-shenzhen.aliyuncs.com/ycpd/component/captcha-slider/picture/canvas%20(' + this.creatRandomBy(1, 20) + ').jpg?x-oss-process=image/resize,m_fill,w_300,h_150,limit_0/auto-orient,0/quality,q_100';
+        },
+
+        /**
+         * 生成随机数的方法
+         * @param {number} min 下限
+         * @param {number} max 上限
+         * @return {number} 基于 min ~ max 之间随机数
+         */
+        creatRandomBy: function creatRandomBy(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
         },
 
         /**
@@ -98,7 +126,6 @@ export default {
         initCanvas: function initCanvas() {
             const _this = this;
 
-            let background_ctx = this.$refs.captchasliderbackground.getContext('2d');
             let objective_ctx = this.$refs.captchasliderobjective.getContext('2d');
             let block_ctx = this.$refs.captchasliderblock.getContext('2d');
             let blockshadow_ctx = this.$refs.captchasliderblockshadow.getContext('2d');
@@ -106,36 +133,18 @@ export default {
             var PI = Math.PI;
             var block_width = 42;
             var block_radius = 10;
-    
-            /**
-             * 生成随机数的方法
-             * @param {number} min 下限
-             * @param {number} max 上限
-             * @return {number} 基于 min ~ max 之间随机数
-             */
-            function creatRandomBy(min, max) {
-                return Math.floor(Math.random() * (max - min + 1)) + min;
-            }
 
             // 初始化 Y轴坐标
             var min_y_coordinate = block_radius * 2 + 15;
             var max_y_coordinate = this.sliderHeight - block_width;
-            var random_y_coordinate = creatRandomBy(min_y_coordinate, max_y_coordinate);
+            var random_y_coordinate = this.creatRandomBy(min_y_coordinate, max_y_coordinate);
 
 
             // 初始化 Y轴坐标
             var min_x_coordinate = block_width + (block_radius * 2) + 15;
             var max_x_coordinate = this.sliderWidth - block_width - (block_radius * 2) - 15;
-            this.target_x_axis = creatRandomBy(min_x_coordinate, max_x_coordinate);
+            this.target_x_axis = this.creatRandomBy(min_x_coordinate, max_x_coordinate);
             var random_x_coordinate = this.target_x_axis;
-
-            // 初始化 图片
-            var imgElement = document.createElement('img');
-            imgElement.onload = function() {
-                background_ctx.drawImage(imgElement, 0, 0, _this.sliderWidth, _this.sliderHeight);
-                block_ctx.drawImage(imgElement, 0, 0, _this.sliderWidth, _this.sliderHeight);
-            };
-            imgElement.src = 'https://ycpd-assets.oss-cn-shenzhen.aliyuncs.com/ycpd/component/captcha-slider/picture/canvas%20(' + creatRandomBy(1, 20) + ').jpg?x-oss-process=image/resize,m_fill,w_300,h_150,limit_0/auto-orient,0/quality,q_100';
 
             /**
              * 绘制拼图的方法
@@ -189,16 +198,7 @@ export default {
             drawObjective();
             drawBlock();
             drawBlockshadow();
-        },
-
-        /**
-         * 绑定 Canvas 位置事件
-         */
-        initCanvasLocation: function initCanvasLocation() {
-            var targetLeftStyle = this.my_x_axis - this.target_x_axis;
-
-            this.$refs.captchasliderblock.style.left = targetLeftStyle + 'px';
-            this.$refs.captchasliderblockshadow.style.left = targetLeftStyle + 'px';
+            this.initNumerical(); // 初始化 数值
         },
 
         /**
@@ -249,7 +249,7 @@ export default {
                 _this.dragHandleIcon = 'active';
 
                 _this.my_x_axis = moveX;
-                _this.initCanvasLocation();
+                _this.targetLeftStyle = _this.my_x_axis - _this.target_x_axis;
                 _this.draghandleleft = moveX;
                 _this.dragmaskwidth = moveX;
             }
@@ -290,12 +290,12 @@ export default {
                 if (isMatch) { // 成功
                     _this.dragHandleIcon = 'succeed';
                     
-                    this.$emit('resolve');
+                    _this.$emit('resolve');
                 } else {
                     _this.dragHandleIcon = 'failure';
 
                     setTimeout(function() {
-                        _this.initCaptchaSlider();
+                        _this.initNumerical.call(_this);
                     }, 1000);
                 }
 

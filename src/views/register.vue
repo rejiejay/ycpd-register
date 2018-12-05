@@ -48,7 +48,7 @@
                 <div class="modal-main-title">人机验证</div>
                 
                 <div class="modal-main-input flex-center">
-                    <captchaSlider :resolve="captchaSliderResolver" />
+                    <captchaSlider @resolve="captchaSliderResolver" />
                 </div>
                 
                 <div class="main-confirm-content">
@@ -123,7 +123,7 @@ export default {
 			phoneValue: '',
 
 			// 是否显示人机验证码模态框
-            isMachineModalShow: true,
+            isMachineModalShow: false,
 
 			// 人机验证码
 			machineNumber: '',
@@ -208,30 +208,10 @@ export default {
         },
 
         /**
-         * 初始化 【滑动拼图】人机验证模态框
-         */
-        // initCaptchaSlider: function initCaptchaSlider() {
-        //     const _this = this;
-
-        //     CaptchaSlider.init({
-        //         id: 'captcha-slider',
-        //         width: 310,
-        //         height: 155,
-        //     })
-        //     .then(function (succeed) {
-        //         _this.checkVerifyCode();
-        //         // alert('succeed!');
-        //     }, function (error) {
-
-        //         // alert('error!');
-        //     });
-        // },
-
-        /**
          * 【滑动拼图】人机验证模态框 验证成功
          */
         captchaSliderResolver: function captchaSliderResolver() {
-            console.log('成功')
+            this.checkVerifyCode();
         },
         
         
