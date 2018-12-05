@@ -360,7 +360,8 @@ export default {
 				_this.replaceToRouter('/supplement/register', {
                     mobile: _this.phoneValue,
                     verifyCode: _this.verifyNumber,
-                    carNoComponents: _this.carNoComponents.carNo
+                    carNo: _this.carNoComponents.carNo,
+                    carType: _this.carNoComponents.carType,
                 });
 			}, function (error) {
 				alert(error);

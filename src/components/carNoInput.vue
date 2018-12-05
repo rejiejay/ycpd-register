@@ -287,10 +287,29 @@ export default {
 	methods: {
         /**
          * 初始化车牌号的方法
-         * @param {string} plateNo 要传递给父组件
+         * @param {string} plateNo 初始化的车牌号
+         * @param {string} carType 初始化的车牌类型 这个有兼容性的问题 所以不一定有值
          */
-        initPlateNoHandle: function initPlateNoHandle(plateNo) {
-            // 为了避免函数报错， 必须先判断 传入的车牌号
+        initPlateNoHandle: function initPlateNoHandle(plateNo, carType) {
+            /**
+             * 车牌类型 转换为响应下标的方法
+             */
+            let carTypeToIndex = carTypeList => {
+                /**
+                 * 因为初始化的车牌类型 所以不一定有值，没有值的情况下默认为 1
+                 */
+                if (!carType) {
+                    return 0
+                }
+
+                let carType_index = 0;
+
+                carTypeList.map((val, key) => val.name === carType ? carType_index = key : null);
+
+                return carType_index;
+            }
+
+            // 为了避免函数报错 判断 传入的车牌号
             if (!plateNo || typeof(plateNo) !== "string" || plateNo.length < 4) {
                 return alert(`车牌号数据‘${plateNo}’有误!`);
             }
@@ -302,33 +321,37 @@ export default {
             this.carNoProvince = plateNo.slice(0, 1);
 
             /**
-             * 检查车型
-             * 判断是否包含 '学' '警' '港' '澳'
+             * 初始化车型 carType_index
              */
-            if (plateNo.indexOf('学') !== -1) {
-                this.carType_index = 3;
-                return this.plateNo = plateNo.slice(1, (plateNo.length - 1));
+            this.carType_index = carTypeToIndex(this.carTypeList);
 
-            } else if (plateNo.indexOf('警') !== -1) {
-                this.carType_index = 4;
-                return this.plateNo = plateNo.slice(1, (plateNo.length - 1));
+            // /**
+            //  * 检查车型
+            //  * 判断是否包含 '学' '警' '港' '澳'
+            //  */
+            // if (plateNo.indexOf('学') !== -1) {
+            //     this.carType_index = 3;
+            //     return this.plateNo = plateNo.slice(1, (plateNo.length - 1));
 
-            } else if (plateNo.indexOf('港') !== -1) {
-                this.carType_index = 5;
-                return this.plateNo = plateNo.slice(1, (plateNo.length - 1));
+            // } else if (plateNo.indexOf('警') !== -1) {
+            //     this.carType_index = 4;
+            //     return this.plateNo = plateNo.slice(1, (plateNo.length - 1));
 
-            } else if (plateNo.indexOf('澳') !== -1) {
-                this.carType_index = 6;
-                return this.plateNo = plateNo.slice(1, (plateNo.length - 1));
+            // } else if (plateNo.indexOf('港') !== -1) {
+            //     this.carType_index = 5;
+            //     return this.plateNo = plateNo.slice(1, (plateNo.length - 1));
 
-            }
+            // } else if (plateNo.indexOf('澳') !== -1) {
+            //     this.carType_index = 6;
+            //     return this.plateNo = plateNo.slice(1, (plateNo.length - 1));
+            // }
 
-            /**
-             * 判断是不是新能源
-             */
-            if (plateNo.length === 8) {
-                this.carType_index = 2;
-            }
+            // /**
+            //  * 判断是不是新能源
+            //  */
+            // if (plateNo.length === 8) {
+            //     this.carType_index = 2;
+            // }
             
             this.plateNo = plateNo.slice(1, plateNo.length);
         },
@@ -504,10 +527,10 @@ export default {
             this.$emit('outPutHandle', {
                 verify: verify,
                 message: message,
-                carNo: `${this.carNoProvince}${this.plateNo}${this.carTypeList[this.carType_index].value}`,
+                carNo: `${this.carNoProvince}${this.plateNo}${''/** 养车频道和金车管家有区别，因为养车频道后台关联东西太多，所以车型不能传值过去 this.carTypeList[this.carType_index].value */}`,
                 carNoProvince: this.carNoProvince,
                 plateNo: this.plateNo,
-                carType: this.carTypeList[this.carType_index].value,
+                carType: this.carTypeList[this.carType_index].name,
             });
         },
     }

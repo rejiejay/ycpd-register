@@ -340,12 +340,12 @@ export default {
 
             // 初始化 车牌组件的车牌号
             this.carNoComponents.carNo = query.CarNo;
-			this.$refs.carNoComponent.initPlateNoHandle(query.CarNo);
+			this.$refs.carNoComponent.initPlateNoHandle(query.CarNo, query.CarType);
 
 			this.platVin = query.VIN; // 车架号码
 			
 			this.isPlatExchange = true; // 表示交换操作
-					
+
 			// 选择中的车辆品牌
 			this.carBrand = query.Brand; 
 
@@ -367,12 +367,11 @@ export default {
             if ( query.IsDefault == '1' ) {
                 this.isDefaultDisabled = true;
             }
-
         
 		} else if (this.pageType === 'register') { // 判断是否注册页面跳转进来
             // 初始化 车牌组件的车牌号
             this.carNoComponents.carNo = query.carNoComponents;
-			this.$refs.carNoComponent.initPlateNoHandle(query.carNoComponents);
+			this.$refs.carNoComponent.initPlateNoHandle(query.carNo, query.carType);
         }
 	},
 

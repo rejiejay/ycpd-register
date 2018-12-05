@@ -45,7 +45,7 @@
 <script>
 
 import ajaxs from "./../api/mycar";
-import ajaxs1 from "@/api/supplement";
+import ajaxsSupplement from "@/api/supplement";
 
 export default {
 	template: '#mycar',
@@ -61,9 +61,62 @@ export default {
 				// 	isDefault: true, // 是否默认
 				// }
             ],
-            userinfo:{
-                customerid:this.$route.params.customerid
-            }
+
+            userinfo: {
+                customerid: this.$route.params.customerid
+            }, 
+
+            carTypeList: [
+                // 小型车 小轿车 普通的车
+                {
+                    key: 'normalCar',
+                    name: '小车',
+                    value: '',
+                    method: () => this.selectCarType(0),
+                }, 
+                // 大车
+                {
+                    key: 'autotruck',
+                    name: '大车',
+                    value: '',
+                    method: () => this.selectCarType(1),
+                },  
+                // 新能源车型
+                {
+                    key: 'newEnergy',
+                    name: '新能源',
+                    value: '',
+                    method: () => this.selectCarType(2),
+                }, 
+                // 教练
+                {
+                    key: 'coachCar',
+                    name: '教练',
+                    value: '学',
+                    method: () => this.selectCarType(3),
+                }, 
+                // 警察
+                {
+                    key: 'policeCar',
+                    name: '警察',
+                    value: '警',
+                    method: () => this.selectCarType(4),
+                }, 
+                // 香港车
+                {
+                    key: 'HongKong',
+                    name: '香港',
+                    value: '港',
+                    method: () => this.selectCarType(5),
+                }, 
+                // 澳门
+                {
+                    key: 'Macao',
+                    name: '澳门',
+                    value: '澳',
+                    method: () => this.selectCarType(6),
+                }, 
+            ],
 		}
 	},
 
@@ -83,7 +136,21 @@ export default {
 		 * 获取车辆信息
 		 */
 		getCarList: function getCarList() {
-			var _this = this;
+            var _this = this;
+            
+            let carTypeListToValue = (CarType) => {
+                let itemCarType = '';
+
+                _this.carTypeList.map(val => {
+                    if (val.name === CarType) {
+                        itemCarType = val.value;
+                    }
+                    
+                    return val
+                });
+
+                return itemCarType
+            }
 
 			ajaxs.getCarList(this.$route.params.customerid)
 			.then(function (carList) {
@@ -93,8 +160,8 @@ export default {
                             return {
                                 nativeData: JSON.parse(JSON.stringify(item)),
                                 CarID: item.CarID, // 车唯一标识
-                                carNo: item.CarNo, // 车牌号
-                                carType:item.Brand +" "+ item.Model, // 车辆类型
+                                carNo: `${item.CarNo}${carTypeListToValue(item.CarType)}`, // 车牌号
+                                carType: `${item.Brand} ${item.Model}`, // 车辆类型
                                 isDefault: (item.IsDefault === 1), // 1为默认车辆 0为非默认车辆
                                 delBtnVisible: false, // 是否显示删除按钮
                             }
@@ -114,18 +181,18 @@ export default {
         // 选择车辆
         changeCar(val) {
             let _this = this
-            ajaxs1.saveCar(
+            ajaxsSupplement.saveCar(
                 _this.userinfo,
                 val.CarID, // 车唯一标识
                 val.CarNo, // 车牌号
+                val.CarType ? val.CarType : '小车', // 车牌型号
                 val.VIN, // 车架号
                 val.Brand, // 品牌
                 val.Series, // 型号
                 val.Years, // 年份
                 val.Model, // 车辆具体型号
                 '1', // 是否默认车辆
-            )
-            .then(() => {
+            ).then(() => {
                 // 判断是否理车云
                 // 如果是理车云跳转的路径不一样的
                 if ( window.localStorage.getItem('isyuyue') == '1' ) {
@@ -133,6 +200,7 @@ export default {
                 } else {
                     window.history.back(-1);
                 }
+
             }, error => alert(error));
         },
 
