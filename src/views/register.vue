@@ -48,7 +48,7 @@
                 <div class="modal-main-title">人机验证</div>
                 
                 <div class="modal-main-input flex-center">
-                    <captchaSlider />
+                    <captchaSlider :resolve="captchaSliderResolver" />
                 </div>
                 
                 <div class="main-confirm-content">
@@ -226,6 +226,14 @@ export default {
         //         // alert('error!');
         //     });
         // },
+
+        /**
+         * 【滑动拼图】人机验证模态框 验证成功
+         */
+        captchaSliderResolver: function captchaSliderResolver() {
+            console.log('成功')
+        },
+        
         
         /**
          * 从车牌输入的组件获取车牌号

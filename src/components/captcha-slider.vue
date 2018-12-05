@@ -18,17 +18,26 @@
     </div>
 
     <!-- 底部拖动部分 -->
-    <div class="captcha-slider-drag" id="slider-drag-content">
+    <div class="captcha-slider-drag" :class="{'slider-drag-activate': dragHandleIcon === 'active', 'slider-drag-succeed': dragHandleIcon === 'succeed', 'slider-drag-failure': dragHandleIcon === 'failure'}" ref="sliderdragcontent" :style="`width: ${sliderWidth - 2}px;`">
         
-        <div class="slider-drag-mask" id="drag-mask">
-            <div class="slider-drag-handle flex-center" id="drag-handle">
-                <svg t="1530238656201" width="23" height="23" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2557" xmlns:xlink="http://www.w3.org/1999/xlink" >
+        <div class="slider-drag-mask" ref="dragmask" :style="`width: ${dragmaskwidth}px;`">
+            <div class="slider-drag-handle flex-center" ref="draghandle" :style="`left: ${draghandleleft}px;`">
+
+                <svg v-if="dragHandleIcon === 'normal' || dragHandleIcon === 'active'" t="1530238656201" width="23" height="23" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2557" xmlns:xlink="http://www.w3.org/1999/xlink" >
                     <path d="M244.363636 556.939636h469.248l-184.762181 170.565819a34.909091 34.909091 0 1 0 47.36 51.29309l250.391272-231.121454a34.955636 34.955636 0 0 0 0-51.293091l-250.391272-231.121455a34.862545 34.862545 0 0 0-49.338182 1.95491 34.909091 34.909091 0 0 0 1.978182 49.338181l184.762181 170.565819H244.363636a34.909091 34.909091 0 1 0 0 69.818181" p-id="2558"></path>
+                </svg>
+
+                <svg v-else-if="dragHandleIcon === 'succeed'" width="24" height="24" t="1530238678016" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3369" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <path fill="#fff" d="M378.410667 850.450963C364.491852 850.450963 350.610963 845.293037 340.02963 834.939259L20.920889 523.529481C-0.279704 502.821926-0.279704 469.295407 20.920889 448.587852 42.121481 427.880296 76.48237 427.880296 97.682963 448.587852L378.410667 722.526815 925.75763 188.491852C946.958222 167.784296 981.319111 167.784296 1002.519704 188.491852 1023.720296 209.161481 1023.720296 242.688 1002.519704 263.395556L416.791704 834.939259C406.172444 845.293037 392.291556 850.450963 378.410667 850.450963L378.410667 850.450963Z" p-id="3370"></path>
+                </svg>
+
+                <svg v-else-if="dragHandleIcon === 'failure'" width="24" height="24" t="1530238678016" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3369" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <path fill="#fff" d="M733.952 336.333l-46.285-46.285L512 465.664 336.333 290.048l-46.285 46.285L465.664 512 290.048 687.667l46.285 46.285L512 558.336l175.667 175.616 46.285-46.285L558.336 512z" p-id="4163"></path>
                 </svg>
             </div>
         </div>
 
-        <div class="slider-drag-text" id="drag-text">向右滑动滑块验证</div>
+        <div class="slider-drag-text" ref="dragtext">{{dragText}}</div>
     </div>
 
 </div>
@@ -49,14 +58,40 @@ export default {
             my_x_axis: 0,
             target_x_axis: 100, // 目标位置
             matchOffset: 3, // 匹配 偏差范围
+
+            dragText: '向右滑动滑块验证',
+
+            dragmaskwidth: 0,
+            draghandleleft: 0,
+
+            /**
+             * 拖动的 icon
+             * @param {string} normal 正常 icon
+             * @param {string} active 激活 icon
+             * @param {string} succeed 成功 icon
+             * @param {string} failure 失败 icon
+             */
+            dragHandleIcon: 'normal',
         } 
     },
 
     mounted: function mounted() {
-        this.initCanvas(); // 初始化 Canvas
+        this.initCaptchaSlider(); // 初始化 整个控件
+
+        // 初始化拖动事件
+        this.initSliderDrag();
+
     },
 
 	methods: {
+        /**
+         * 初始化 整个控件
+         */
+        initCaptchaSlider: function initCaptchaSlider() {
+            this.initCanvas(); // 初始化 Canvas
+            this.initCanvasLocation(); // 绑定 Canvas 位置事件
+        },
+
         /**
          * 初始化 Canvas
          */
@@ -165,6 +200,134 @@ export default {
             this.$refs.captchasliderblock.style.left = targetLeftStyle + 'px';
             this.$refs.captchasliderblockshadow.style.left = targetLeftStyle + 'px';
         },
+
+        /**
+         * 初始化 拖动
+         */
+        initSliderDrag: function initSliderDrag() {
+            var _this = this;
+
+            /**
+             * 判断是否移动设备
+             */
+            var isMobiler = (function () {
+                var isMobile = false;
+            
+                var myWidth = document.body.offsetWidth || document.documentElement.clientWidth || window.innerWidth;
+            
+                if (myWidth <= 768) { // 保底策略
+                    isMobile = true;
+                }
+            
+                ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPod'].map(function (terminal) {
+                    if (window.navigator.userAgent.indexOf(terminal) > 0) {
+                    isMobile = true;
+                    }
+                    return terminal;
+                })
+            
+                return isMobile
+            })();
+
+            // 位移量
+            var originX = 0;
+            var originY = 0;
+            var moveX = 0;
+            var moveY = 0;
+
+            // 定位成功
+            var isMatch = false;
+
+            /**
+             * 拖动位置
+             */
+            var dragLocationModifier = function () {
+                // 删除文字
+                _this.dragText = '';
+
+                // 添加激活状态
+                _this.dragHandleIcon = 'active';
+
+                _this.my_x_axis = moveX;
+                _this.initCanvasLocation();
+                _this.draghandleleft = moveX;
+                _this.dragmaskwidth = moveX;
+            }
+
+            var handleMouseMove = function (event) {
+                // 位移量
+                var mouseOffset = 0;
+                if (isMobiler) { // 兼容移动端
+                    mouseOffset = event.changedTouches[0].clientX - originX;
+                } else {
+                    mouseOffset = event.x - originX
+                }
+
+                // 移动到目标 范围
+                if (
+                    mouseOffset > 0 &&  // 不能负数
+                    mouseOffset < (_this.sliderWidth -  62) // 不能超过
+                ) {
+                    moveX = mouseOffset;
+                    moveY = event.y - originY;
+                }
+
+                // 匹配目标
+                if (
+                    mouseOffset >= (_this.target_x_axis - _this.matchOffset) && // 偏差
+                    mouseOffset <= (_this.target_x_axis + _this.matchOffset)
+                ) {
+                    isMatch = true;
+                } else {
+                    isMatch = false;
+                }
+
+                dragLocationModifier();
+            };
+
+            var handleMouseEnd = function handleMouseEnd() {
+
+                if (isMatch) { // 成功
+                    _this.dragHandleIcon = 'succeed';
+                    
+                    this.$emit('resolve');
+                } else {
+                    _this.dragHandleIcon = 'failure';
+
+                    setTimeout(function() {
+                        _this.initCaptchaSlider();
+                    }, 1000);
+                }
+
+                if (isMobiler) { // 兼容移动端
+                    window.removeEventListener('touchmove', handleMouseMove);
+                    window.removeEventListener('touchend', handleMouseEnd);
+                } else {
+                    window.removeEventListener('mousemove', handleMouseMove);
+                    window.removeEventListener('mouseup', handleMouseEnd);
+                }
+            };
+
+            if (isMobiler) { // 兼容移动端
+                this.$refs.draghandle.addEventListener('touchstart', function (event) {
+                    // 原始坐标
+                    originX = event.changedTouches[0].clientX;
+                    originY = event.changedTouches[0].clientY;
+            
+                    window.addEventListener('touchmove', handleMouseMove);
+                    window.addEventListener('touchend', handleMouseEnd);
+                }); 
+            } else {
+                this.$refs.draghandle.addEventListener('mousedown', function (event) {
+                    // 原始坐标
+                    originX = event.x;
+                    originY = event.y;
+            
+                    window.addEventListener('mousemove', handleMouseMove);
+                    window.addEventListener('mouseup', handleMouseEnd);
+                }); 
+            }
+        }
 
     }
 }
