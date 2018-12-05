@@ -47,8 +47,8 @@
 
                 <div class="modal-main-title">人机验证</div>
                 
-                <div class="modal-main-input flex-start-center">
-                    <div id="captcha-slider" class="captcha-slider"></div>
+                <div class="modal-main-input flex-center">
+                    <captchaSlider />
                 </div>
                 
                 <div class="main-confirm-content">
@@ -108,11 +108,12 @@ import ajaxs from "@/api/register";
 import Consequencer from "@/utils/Consequencer";
 import wxLocation from "@/components/wxLocation";
 import carNoInput from "@/components/carNoInput";
+import captchaSlider from "@/components/captcha-slider";
 
 export default {
     name: 'register',
 
-    components: { carNoInput },
+    components: { carNoInput, captchaSlider },
 
     data () {
         return {
@@ -122,7 +123,7 @@ export default {
 			phoneValue: '',
 
 			// 是否显示人机验证码模态框
-			isMachineModalShow: false,
+            isMachineModalShow: true,
 
 			// 人机验证码
 			machineNumber: '',
@@ -170,7 +171,7 @@ export default {
         this.initPageData();
 
         // 初始化 【滑动拼图】人机验证模态框
-        this.initCaptchaSlider();
+        // this.initCaptchaSlider();
     },
     
     watch: {
@@ -209,22 +210,22 @@ export default {
         /**
          * 初始化 【滑动拼图】人机验证模态框
          */
-        initCaptchaSlider: function initCaptchaSlider() {
-            const _this = this;
+        // initCaptchaSlider: function initCaptchaSlider() {
+        //     const _this = this;
 
-            CaptchaSlider.init({
-                id: 'captcha-slider',
-                width: 310,
-                height: 155,
-            })
-            .then(function (succeed) {
-                _this.checkVerifyCode();
-                // alert('succeed!');
-            }, function (error) {
+        //     CaptchaSlider.init({
+        //         id: 'captcha-slider',
+        //         width: 310,
+        //         height: 155,
+        //     })
+        //     .then(function (succeed) {
+        //         _this.checkVerifyCode();
+        //         // alert('succeed!');
+        //     }, function (error) {
 
-                // alert('error!');
-            });
-        },
+        //         // alert('error!');
+        //     });
+        // },
         
         /**
          * 从车牌输入的组件获取车牌号
