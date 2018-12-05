@@ -83,6 +83,13 @@ export default {
         // 初始化拖动事件
         this.initSliderDrag();
 
+        // 因为有时候不知道为啥会获取失败, 所以分别延时获取3次
+        setTimeout(() => {
+            this.initCanvasBackground();
+        }, 1000);
+        setTimeout(() => {
+            this.initCanvasBackground();
+        }, 2000);
     },
 
 	methods: {
@@ -90,14 +97,21 @@ export default {
          * 初始化 数值
          */
         initNumerical: function initNumerical() {
-            const _this = this;
-
             this.dragHandleIcon = 'normal';
             this.my_x_axis = 0;
             this.draghandleleft = 0;
             this.dragmaskwidth = 0;
             this.targetLeftStyle = this.my_x_axis - this.target_x_axis;
             this.dragText = '向右滑动滑块验证';
+
+            this.initCanvasBackground();
+        },
+
+        /**
+         * 初始化 图片
+         */
+        initCanvasBackground: function initCanvasBackground() {
+            const _this = this;
 
             // 初始化 图片
             let background_ctx = this.$refs.captchasliderbackground.getContext('2d');
@@ -107,6 +121,7 @@ export default {
                 background_ctx.drawImage(imgElement, 0, 0, _this.sliderWidth, _this.sliderHeight);
                 block_ctx.drawImage(imgElement, 0, 0, _this.sliderWidth, _this.sliderHeight);
             };
+
             imgElement.src = 'https://ycpd-assets.oss-cn-shenzhen.aliyuncs.com/ycpd/component/captcha-slider/picture/canvas%20(' + this.creatRandomBy(1, 20) + ').jpg?x-oss-process=image/resize,m_fill,w_300,h_150,limit_0/auto-orient,0/quality,q_100';
         },
 
