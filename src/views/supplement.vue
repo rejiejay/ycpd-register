@@ -556,7 +556,11 @@ export default {
 		 * 通过VIN查询公众接口获取车型列表
 		 */
 		platVinExchange: function platVinExchange() {
-			var _this = this;
+            var _this = this;
+
+            if ( this.platVin.length > 0 && this.platVin.length < 17 || this.platVin.length > 17 ) {
+                alert('请输入正确输入17位车架号')
+            }
            
 			// 十七个英数组成, 英文字母“I”、“O”、“Q”均不会被使用
 			if (this.platVin.length ===  17) {
@@ -568,8 +572,8 @@ export default {
                 this.yearModelList = [];
 
 				ajaxs.getCarModelByVin(this.platVin) // 查询失败不做处理
-				.then(function (carInfor) {
-                    if(carInfor.Matching=='True'){
+				.then(carInfor => {
+                    if ( carInfor.Matching == 'True' ) {
                         _this.isPlatExchange = true; // 表示交换操作
 					
                         // 选择中的车辆品牌
@@ -589,7 +593,9 @@ export default {
                     } else {
                         return alert('解析出现错误, 请手动选择!');
                     }
-				});
+                }, error => {
+                    alert(error);
+                });
 			}
 		},
 
@@ -604,10 +610,10 @@ export default {
 			// 	return Consequencer.error('车牌号码有误!');
 			// }
 
-			// // 校验车架号码
-		    // if (this.platVin.length !==  17) {
-			// 	return Consequencer.error('车架号码有误!');
-            // }
+			// 校验车架号码
+            if ( this.platVin.length > 0 && this.platVin.length < 17 || this.platVin.length > 17 ) {
+                return Consequencer.error('请输入正确输入17位车架号');
+            }
 
             // 校验车牌号码 组件已经校验好了
             if (this.carNoComponents.verify === false) {
@@ -647,10 +653,6 @@ export default {
 			var myVerifyAll = this.verifyAll();
 			if (myVerifyAll.result !== 1) {
 				return alert(myVerifyAll.message);
-            }
-
-            if (this.platVin && this.platVin.length!==17) {
-				return ('车架号码有误!');
             }
             
 			// 判断页面状态

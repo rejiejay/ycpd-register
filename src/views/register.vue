@@ -48,7 +48,7 @@
                 <div class="modal-main-title">人机验证</div>
                 
                 <div class="modal-main-input flex-center">
-                    <captchaSlider @resolve="captchaSliderResolver" />
+                    <captchaSlider ref="captchaSliderComponent" @resolve="captchaSliderResolver" />
                 </div>
                 
                 <div class="main-confirm-content">
@@ -250,7 +250,9 @@ export default {
 
 			// 判断是否正在获取验证码
 			if (this.isVerifyGeting === false) { // 没有获取验证码的情况
-				
+                
+                // 因为 Vue 可能与 canvas 不兼容， 所以每当这个模态框打开的时候，渲染一次
+                this.$refs.captchaSliderComponent.initCanvasBackground();
                 this.isMachineModalShow = true; // 弹出模态框
                 // 不需要生成 数字验证码
 				// this.renderBase64MachineNumber();

@@ -169,7 +169,7 @@ export default {
 				if (response && response.Code === 200 && response.Data instanceof Array && response.Data.length > 0) {
 					resolve(response.Data[0]);
 				} else {
-					reject();
+					reject('获取车辆具体型号列表失败,请手动选择');
 				}
 			});
 		});

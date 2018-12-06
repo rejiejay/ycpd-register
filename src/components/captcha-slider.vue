@@ -82,14 +82,6 @@ export default {
 
         // 初始化拖动事件
         this.initSliderDrag();
-
-        // 因为有时候不知道为啥会获取失败, 所以分别延时获取3次
-        setTimeout(() => {
-            this.initCanvasBackground();
-        }, 1000);
-        setTimeout(() => {
-            this.initCanvasBackground();
-        }, 2000);
     },
 
 	methods: {
@@ -109,6 +101,8 @@ export default {
 
         /**
          * 初始化 图片
+         * 因为 Vue 可能与 canvas 不兼容， 所以这个方法抽象出来
+         * 当模态框渲染的时候，调用一次这个函数
          */
         initCanvasBackground: function initCanvasBackground() {
             const _this = this;
