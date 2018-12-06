@@ -242,6 +242,7 @@ export default {
 		 * 获取验证码
 		 */
 		verifyNumberHandle: function verifyNumberHandle() {
+            const _this = this;
 
 			// 校验手机号码
 			if (this.verifyPhoneValue().result !== 1) {
@@ -250,12 +251,19 @@ export default {
 
 			// 判断是否正在获取验证码
 			if (this.isVerifyGeting === false) { // 没有获取验证码的情况
-                
-                // 因为 Vue 可能与 canvas 不兼容， 所以每当这个模态框打开的时候，渲染一次
-                this.$refs.captchaSliderComponent.initCanvasBackground();
+
                 this.isMachineModalShow = true; // 弹出模态框
-                // 不需要生成 数字验证码
-				// this.renderBase64MachineNumber();
+
+                this.$nextTick(function () {
+                    // 因为 Vue 可能与 canvas 不兼容， 所以每当这个模态框打开的时候，渲染一次
+                    _this.$refs.captchaSliderComponent.initCanvasBackground();
+
+                    // 多加一次定时器渲染， 因为还有图片渲染不出来的情况
+                    setTimeout(() => {
+                        // 因为 Vue 可能与 canvas 不兼容， 所以每当这个模态框打开的时候，渲染一次
+                        _this.$refs.captchaSliderComponent.initCanvasBackground();
+                    }, 100);
+                });
 			}
 		},
 
