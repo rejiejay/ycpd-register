@@ -6,18 +6,26 @@ Vue.use(Router);
 const routes = [
     /**
      * 注册
-     * @param {String} openid 微信 用户标识 o9rEN0_rX4ySFsIbKi5MBL8YGnAg
+     * 因为有持久化的需求
      */
     {
-        path: '/index/:openid', // 注册
-        alias: ['/'],
-        component: () => import('@/views/register'),
-        meta: { title: '注册' },
-    }, {
-        path: '/agreement/', // 用户协议页
-        component: () => import('@/views/agreement'),
-        meta: { title: '养车频道用户服务协议' },
-    }, 
+        path: '/index/:openid', // 微信 用户标识 o9rEN0_rX4ySFsIbKi5MBL8YGnAg
+        component: () => import('@/views/register/index'),
+        children: [
+            {
+                path: 'index',
+                alias: ['/'],
+                name: 'register-main',
+                component: () => import('@/views/register/register'),
+                meta: { title: '注册' },
+            }, {
+                path: 'agreement',
+                name: 'agreement',
+                component: () => import('@/views/register/agreement'),
+                meta: { title: '养车频道用户服务协议' },
+            },
+        ],
+    },
 
     /**
      * 我的车辆列表

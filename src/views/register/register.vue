@@ -77,9 +77,10 @@
 
         <!-- 协议 -->
         <div class="register-agreement">
-            <div class="register-agreement-content flex-start-center" @click="isAgreement = !isAgreement">
+            <div class="register-agreement-content flex-start-center">
                 <div class="agreement-radio-content" 
                     :class="[isAgreement ? 'agreement-radio-selected' : 'register-agreement-radio']"
+                    @click="isAgreement = !isAgreement"
                 >
                     <svg width="16" height="16" t="1535773287663" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2604" xmlns:xlink="http://www.w3.org/1999/xlink">
                         <path d="M511.452 957.752c-246.502 0-447.037-200.535-447.037-447.027 0-246.497 200.535-447.037 447.037-447.037S958.49 264.228 958.49 510.725c0 246.492-200.535 447.027-447.038 447.027z m0-842.788c-218.224 0-395.766 177.542-395.766 395.766s177.542 395.75 395.766 395.75 395.766-177.525 395.766-395.75-177.541-395.766-395.766-395.766z" p-id="2605"></path>
@@ -111,7 +112,7 @@ import carNoInput from "@/components/carNoInput";
 import captchaSlider from "@/components/captcha-slider";
 
 export default {
-    name: 'register',
+    name: 'register-main',
 
     components: { carNoInput, captchaSlider },
 
@@ -182,24 +183,33 @@ export default {
         initPageData: function initPageData() {
             var _this = this;
             
-            // 跳转到养车频道用户服务协议 实现本地缓存
-            if (window.sessionStorage.getItem('phoneValue') && window.sessionStorage.getItem('verifyNumber')) {
-                this.verifyNumber = window.sessionStorage.getItem('verifyNumber')
-                this.phoneValue = window.sessionStorage.getItem('phoneValue')
-            }
+            // 判断openid 的合法性 并且 缓存openid 
+            if (this.$route.params.openid && this.$route.params.openid.length > 15) {
+                this.$store.commit('initOpenid', this.$route.params.openid); // 设置到 vuex
+                window.localStorage.setItem('openid', this.$route.params.openid)  // 本地存储 openid， 其他地方会用到
 
-            // 页面状态 初始化
-            this.$store.commit('initOpenid', this.$route.params.openid); // 设置到 vuex
-            window.localStorage.setItem('openid', this.$route.params.openid)  // 本地存储 openid， 其他地方会用到
-            
+            // 如果 openid 不存在
+            } else {
+                // 提示重新获取（非常重要）
+                if (confirm('获取微信用户信息失败, 是否重新获取?')) {
+                    window.location.href = config.YcpdUrlWidthWxCode(); // 重新获取 code
+
+                } else {
+                    // 如果不进行重新获取 弹出报错信息 返回上一页
+                    alert('注册失败, 无法获取微信openid, 请联系客服人员.');
+                    window.history.back(-1);
+                }
+            }
+    
             // 初始化位置信息
-            wxLocation.init()
-            .then(function(position) {
-                wxLocation.getCityName(position)
-                .then(function(cityName) {
-                    _this.$store.commit('initCity', cityName); // 设置到 vuex
-                });
-            });
+            // 因为现在不需要这个值, 所以 不需要获取城市信息都可
+            // wxLocation.init()
+            // .then(function(position) {
+            //     wxLocation.getCityName(position)
+            //     .then(function(cityName) {
+            //         _this.$store.commit('initCity', cityName); // 设置到 vuex
+            //     });
+            // });
         },
 
         /**
@@ -208,7 +218,6 @@ export default {
         captchaSliderResolver: function captchaSliderResolver() {
             this.checkVerifyCode();
         },
-        
         
         /**
          * 从车牌输入的组件获取车牌号
@@ -308,9 +317,7 @@ export default {
 		 * 跳转到 养车频道用户服务协议
 		 */
 		jumpToAgreement: function jumpToAgreement() {
-            window.sessionStorage.setItem('phoneValue', this.phoneValue);
-            window.sessionStorage.setItem('verifyNumber', this.verifyNumber);
-			this.$router.push({ path: '/agreement/', });
+			this.$router.push({ path: 'agreement', });
 		},
 
 		/**

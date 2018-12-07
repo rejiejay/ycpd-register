@@ -5,6 +5,14 @@ module.exports = {
         origin1: 'http://picc.hotgz.com', // 请求源(服务器地址)
         origin2: 'http://ycpdapi.hotgz.com', // 请求源(服务器地址)
         
+        wxappid: {
+            ycpd: 'wx69b29a9a280c57d9', // 养车频道（YCPD微信公众号）
+        },
+    
+        location: {
+            ycpd: 'http://picc.hotgz.com/wx20/index.html', // 养车频道 地址
+        },
+        
         // 车辆品牌车系以及短信验证码
         carBrandSeriesCode: '/wx/Handler.ashx',
         

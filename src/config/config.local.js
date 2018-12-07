@@ -5,6 +5,14 @@ module.exports = {
         origin1: 'http://store.demo.ichebaoyang.com', // 请求源(服务器地址)
         origin2: 'http://api.demo.hotgz.com', // 请求源(服务器地址)
 
+        wxappid: {
+            ycpd: 'wxa21f56d22d9482b1', // 养车频道（HConnect技术中心公众号）
+        },
+
+        location: {
+            ycpd: 'http://store.demo.ichebaoyang.com/wx20/index.html', // 养车频道 地址
+        },
+
         // 车辆品牌车系以及短信验证码
         carBrandSeriesCode: 'http://store.demo.ichebaoyang.com/wx/Handler.ashx',
 
