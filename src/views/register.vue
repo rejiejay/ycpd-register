@@ -156,22 +156,9 @@ export default {
         }
     },
 
-    created: function created() { 
-        // 实现本地缓存
-        if(window.localStorage.getItem('phoneValue') && window.localStorage.getItem('verifyNumber')){
-            this.verifyNumber = window.localStorage.getItem('verifyNumber')
-            this.phoneValue = window.localStorage.getItem('phoneValue')
-        }
-
-        window.localStorage.setItem('openid', this.$route.params.openid)  // 本地存储 openid， 其他地方会用到
-    },
-
 	mounted: function mounted() { 
         // 初始化页面数据
         this.initPageData();
-
-        // 初始化 【滑动拼图】人机验证模态框
-        // this.initCaptchaSlider();
     },
     
     watch: {
@@ -194,8 +181,16 @@ export default {
          */
         initPageData: function initPageData() {
             var _this = this;
+            
+            // 跳转到养车频道用户服务协议 实现本地缓存
+            if (window.sessionStorage.getItem('phoneValue') && window.sessionStorage.getItem('verifyNumber')) {
+                this.verifyNumber = window.sessionStorage.getItem('verifyNumber')
+                this.phoneValue = window.sessionStorage.getItem('phoneValue')
+            }
+
             // 页面状态 初始化
             this.$store.commit('initOpenid', this.$route.params.openid); // 设置到 vuex
+            window.localStorage.setItem('openid', this.$route.params.openid)  // 本地存储 openid， 其他地方会用到
             
             // 初始化位置信息
             wxLocation.init()
@@ -255,8 +250,10 @@ export default {
                 this.isMachineModalShow = true; // 弹出模态框
 
                 this.$nextTick(function () {
+
+
                     // 因为 Vue 可能与 canvas 不兼容， 所以每当这个模态框打开的时候，渲染一次
-                    _this.$refs.captchaSliderComponent.initCanvasBackground();
+                    _this.$refs.captchaSliderComponent.initNumerical();
 
                     // 多加一次定时器渲染， 因为还有图片渲染不出来的情况
                     setTimeout(() => {
@@ -311,8 +308,8 @@ export default {
 		 * 跳转到 养车频道用户服务协议
 		 */
 		jumpToAgreement: function jumpToAgreement() {
-            window.localStorage.setItem('phoneValue',this.phoneValue)
-            window.localStorage.setItem('verifyNumber',this.verifyNumber)
+            window.sessionStorage.setItem('phoneValue', this.phoneValue);
+            window.sessionStorage.setItem('verifyNumber', this.verifyNumber);
 			this.$router.push({ path: '/agreement/', });
 		},
 
