@@ -56,25 +56,6 @@
             </div>
         </div>
 
-        <!-- 【数字验证】人机验证模态框 -->
-        <!-- <div class="machine-verify-modal flex-center" :class="{'machine-verify-show': isMachineModalShow}">
-            <div class="verify-modal-shade" @click="isMachineModalShow = false"></div>
-            <div class="verify-modal-main" :style="'width: ' + (clientWidth - 30) + 'px;'">
-
-                <div class="modal-main-title">人机验证</div>
-                
-                <div class="modal-main-input flex-start-center">
-                    <input class="flex-rest" v-model="machineNumber" placeholder="输入右边的验证码以获取短信验证码" />
-                    <div class="flex-center" @click="renderBase64MachineNumber"><img ref="base64MachineNumber" src="" /></div>
-                </div>
-                <div class="modal-main-error" v-if="machineNumberErrorMsg !== ''">{{machineNumberErrorMsg}}</div>
-                
-                <div class="main-confirm-content">
-                    <div class="modal-main-confirm" @click="checkVerifyCode">确认</div>
-                </div>
-            </div>
-        </div> -->
-
         <!-- 协议 -->
         <div class="register-agreement">
             <div class="register-agreement-content flex-start-center">
@@ -105,6 +86,7 @@
 
 // 请求类
 import ajaxs from "@/api/register";
+import supplementAjaxs from "@/api/supplement";
 // 自定义组件类
 import Consequencer from "@/utils/Consequencer";
 import wxLocation from "@/components/wxLocation";
@@ -141,8 +123,6 @@ export default {
                 carType: '',
             },
             
-			machineNumberErrorMsg: '', // 人机验证码错误信息
-
 			// 验证号码
 			verifyNumber: '',
 
@@ -157,19 +137,18 @@ export default {
         }
     },
 
+    computed: {
+        /**
+         * 顶层 vuex 用户信息
+         */
+        userinfo: function userinfo() {
+            return this.$store.getters.statesGetters;
+        }
+    },
+
 	mounted: function mounted() { 
         // 初始化页面数据
         this.initPageData();
-    },
-    
-    watch: {
-        /**
-         * 监听输入验证码
-         * 则将错误信息清空
-         */
-        machineNumber: function () {
-            this.machineNumberErrorMsg = '';
-        }
     },
 
     destroyed: function () {
@@ -202,14 +181,13 @@ export default {
             }
     
             // 初始化位置信息
-            // 因为现在不需要这个值, 所以 不需要获取城市信息都可
-            // wxLocation.init()
-            // .then(function(position) {
-            //     wxLocation.getCityName(position)
-            //     .then(function(cityName) {
-            //         _this.$store.commit('initCity', cityName); // 设置到 vuex
-            //     });
-            // });
+            wxLocation.init()
+            .then(function(position) {
+                wxLocation.getCityName(position)
+                .then(function(cityName) {
+                    _this.$store.commit('initCity', cityName); // 设置到 vuex
+                });
+            });
         },
 
         /**
@@ -274,28 +252,20 @@ export default {
 		},
 
 		/**
-		 * 渲染验证码
-		 */
-		renderBase64MachineNumber: function renderBase64MachineNumber() {
-			this.$refs.base64MachineNumber.src = ajaxs.getMachineCode(this.$route.params.openid);
-		},
-
-		/**
 		 * 验证验证码是否正确
 		 */
 		checkVerifyCode: function checkVerifyCode() {
 			var _this = this;
 
-			// if (this.machineNumber.length !== 4) {
-			// 	return alert('请输入正确验证码');
-			// }
-
-			// 图形验证码移动的距离 暂时为零
+            // 图形验证码移动的距离 暂时为零
+            // 因为以前是数字验证码, 所以 这个是兼容的写法，历史遗留问题
 			ajaxs.getMobileCode(this.phoneValue, this.machineNumber, this.$route.params.openid)
 			.then(function () {
+
 				_this.isVerifyGeting = true; // 表示正在获取
 				_this.isMachineModalShow = false; // 弹出模态框
-				// 定时器倒计时 60 秒
+                
+                // 定时器倒计时 60 秒
 				for(var i = 0; i < 60; i++ ) {
 					(function (i) { // 匿名函数自执行创建闭包
 						setTimeout(function() {
@@ -309,7 +279,6 @@ export default {
 				}
 			}, function (error) {
                 alert(error);
-                // _this.machineNumberErrorMsg = error;
 			}); 
 		},
 
@@ -325,7 +294,6 @@ export default {
 		 * 并且跳转到下一页
 		 */
 		submitRegister: function submitRegister() {
-           
 			var _this = this;
 
             // 校验车牌号码 组件已经校验好了
@@ -346,26 +314,116 @@ export default {
 			// 用户协议
 			if (this.isAgreement === false) {
 				return alert('请同意用户协议!');
-			}
+            }
 
+            /**
+             * 【第三步】 根据状态去跳转对应的页面
+             */
+            let jumpHandleBystaus = () => {
+                let latitude = 114;
+                let longitude = 22.7;
+
+                /**
+                 * 跳转到优惠加油页面方法
+                 */
+                let jumpToGetStation = () => {
+                    $.ajax({
+                        url: config.url.getStationHandler,
+                        type: "post",
+                        data: {
+                            action: "GetStation",
+                            lattude: latitude,
+                            lontude: longitude,
+                            openid: window.localStorage.getItem('openid'),
+                        },
+                        success: function(datas) {
+                            window.location.href = datas.Url;
+                        }
+                    });
+                }
+
+                // 判断页面状态  根据状态去跳转对应的页面
+                if ( window.localStorage.getItem('pageType') === 'piccPage' || window.localStorage.getItem('pageType') === '人保' ) {
+                    window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.getItem('openid')}&name=人保`;
+
+                } else if ( window.localStorage.getItem('pageType') === '平安' ) {
+                    window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.getItem('openid')}&name=平安`;
+
+                } else if ( window.localStorage.getItem('pageType') === 'LCY' ) {
+                    window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.getItem('openid')}&name=理车云`;
+
+                } else if ( window.localStorage.getItem('pageType') === 'gasStation' ) {
+
+                    // 获取定位
+                    if( window.localStorage.getItem('latitude') && window.localStorage.getItem('longitude') ) {
+                        latitude = window.localStorage.getItem('latitude');
+                        longitude = window.localStorage.getItem('longitude');
+                        jumpToGetStation(); // 跳转到优惠加油页面方法
+
+                    } else {
+
+                        // 获取定位
+                        html5WxBMapLocation(this, true)
+                        .then(position => {
+                            latitude = position.latitude;
+                            longitude = position.longitude;
+                            jumpToGetStation(); // 跳转到优惠加油页面方法
+
+                        }, error => {
+                            // 获取定位失败，就用默认的定位跳转就好了，不需要报错
+                            jumpToGetStation(); // 跳转到优惠加油页面方法
+                        });
+                    }
+
+                } else {
+                    // 否则这就 哪里点的就回哪里
+                    window.history.back(-1); 
+                }
+            }
+            
+            /**
+             * 【第二步】 暂不添加车辆信息 注册
+             */
+            let notAddCarInforToRegister = () => {
+                supplementAjaxs.register(
+                    _this.userinfo, 
+                    _this.carNoComponents.carNo, // 车牌号
+                    _this.carNoComponents.carType, // 车牌类型
+                ).then(function () {
+                    /**
+                     * 注册成功后，【第三步】 根据状态去跳转对应的页面
+                     */
+                    jumpHandleBystaus();
+                
+                }, function (error) {
+                    alert('注册失败');
+                })
+            }
+
+            /**
+             * 【第一步】 校验手机号码 与 code 是否正确
+             */
 			ajaxs.verifyMobileCodeNumber(this.phoneValue, this.verifyNumber)
 			.then(function () {
-                /**
-                 * 存储数据到 vuex (全局)
-                 * 简单的跳转逻辑犯不着用 vuex，徒增复杂度
-                 * 直接路由带过去就行了
-                 */
-                _this.$store.commit('initPhone', { 
-                    mobile: _this.phoneValue,
-                    verifyCode: _this.verifyNumber,
-                });
-                
-				_this.replaceToRouter('/supplement/register', {
-                    mobile: _this.phoneValue,
-                    verifyCode: _this.verifyNumber,
-                    carNo: _this.carNoComponents.carNo,
-                    carType: _this.carNoComponents.carType,
-                });
+                // 原本是应该跳转到 车辆信息 
+                // 考虑需求会改动，这段代码就不删掉了，以后可能会有添加车辆信息的需求
+                // /**
+                //  * 存储数据到 vuex (全局)
+                //  * 简单的跳转逻辑犯不着用 vuex，徒增复杂度
+                //  * 直接路由带过去就行了
+                //  */
+                // _this.$store.commit('initPhone', { 
+                //     mobile: _this.phoneValue,
+                //     verifyCode: _this.verifyNumber,
+                // });
+				// _this.replaceToRouter('/supplement/register', {
+                //     mobile: _this.phoneValue,
+                //     verifyCode: _this.verifyNumber,
+                //     carNo: _this.carNoComponents.carNo,
+                //     carType: _this.carNoComponents.carType,
+                // });
+
+                notAddCarInforToRegister(); // 校验手机号码成功 【第二步】暂不添加车辆信息 注册
 			}, function (error) {
 				alert(error);
 			});

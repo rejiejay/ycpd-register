@@ -644,7 +644,8 @@ export default {
         },
 
 		/**
-		 * 注册提交按钮
+		 * 添加车牌注册【废弃】
+         * （因为上一个页面已经无法跳转到这个页面, 所以这个几个方法注定是废弃的）
 		 */
 		registerSubmit: function registerSubmit() {
             let _this = this;
@@ -723,7 +724,8 @@ export default {
         },
         
         /**
-         * 根据状态去跳转对应的页面
+         * 根据状态去跳转对应的页面【废弃】
+         * （因为上一个页面已经无法跳转到这个页面, 所以这个几个方法注定是废弃的）
          */
         jumpHandleBystaus: function jumpHandleBystaus() {
             let latitude = 114;
@@ -787,9 +789,9 @@ export default {
             }
         },
 
-
 		/**
-		 * 暂不添加
+		 * 暂不添加车辆信息 注册【废弃】
+         * （因为上一个页面已经无法跳转到这个页面, 所以这个几个方法注定是废弃的）
 		 */
 		notToRegister: function notToRegister() {
             const _this = this;
