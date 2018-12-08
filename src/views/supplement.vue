@@ -611,8 +611,10 @@ export default {
 			// }
 
 			// 校验车架号码
-            if ( this.platVin.length > 0 && this.platVin.length < 17 || this.platVin.length > 17 ) {
-                return Consequencer.error('请输入正确输入17位车架号');
+            if(this.platVin){
+                if ( this.platVin.length > 0 && this.platVin.length < 17 || this.platVin.length > 17 ) {
+                    return Consequencer.error('请输入正确输入17位车架号');
+                }
             }
 
             // 校验车牌号码 组件已经校验好了

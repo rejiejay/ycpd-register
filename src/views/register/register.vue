@@ -84,6 +84,8 @@
 
 <script>
 
+// 框架类
+import { Toast } from 'mint-ui';
 // 请求类
 import ajaxs from "@/api/register";
 import supplementAjaxs from "@/api/supplement";
@@ -390,10 +392,14 @@ export default {
                     _this.carNoComponents.carNo, // 车牌号
                     _this.carNoComponents.carType, // 车牌类型
                 ).then(function () {
-                    /**
-                     * 注册成功后，【第三步】 根据状态去跳转对应的页面
-                     */
-                    jumpHandleBystaus();
+
+                    Toast({ message: '注册成功', duration: 2000 }); // 弹出提示
+                    setTimeout(() => {
+                        /**
+                         * 注册成功后，【第三步】 根据状态去跳转对应的页面
+                         */
+                        jumpHandleBystaus();
+                    }, 2000);
                 
                 }, function (error) {
                     alert('注册失败');
@@ -407,15 +413,15 @@ export default {
 			.then(function () {
                 // 原本是应该跳转到 车辆信息 
                 // 考虑需求会改动，这段代码就不删掉了，以后可能会有添加车辆信息的需求
-                // /**
-                //  * 存储数据到 vuex (全局)
-                //  * 简单的跳转逻辑犯不着用 vuex，徒增复杂度
-                //  * 直接路由带过去就行了
-                //  */
-                // _this.$store.commit('initPhone', { 
-                //     mobile: _this.phoneValue,
-                //     verifyCode: _this.verifyNumber,
-                // });
+                /**
+                 * 存储数据到 vuex (全局)
+                 * 简单的跳转逻辑犯不着用 vuex，徒增复杂度
+                 * 直接路由带过去就行了
+                 */
+                _this.$store.commit('initPhone', { 
+                    mobile: _this.phoneValue,
+                    verifyCode: _this.verifyNumber,
+                });
 				// _this.replaceToRouter('/supplement/register', {
                 //     mobile: _this.phoneValue,
                 //     verifyCode: _this.verifyNumber,
