@@ -164,7 +164,7 @@ export default {
 		Indicator.open('正在加载数据...');
 
 		return new Promise(function (resolve, reject) {
-			$.get(config.url.getCarModelByVin, {vin: vin}, function(response, status, xhr) {
+			$.get(config.url.getCarModelByVin, {vin: vin, openid: window.localStorage.openid}, function(response, status, xhr) {
 				Indicator.close();
 				if (response && response.Code === 200 && response.Data instanceof Array && response.Data.length > 0) {
 					resolve(response.Data[0]);

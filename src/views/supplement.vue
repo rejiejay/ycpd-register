@@ -646,8 +646,7 @@ export default {
         },
 
 		/**
-		 * 添加车牌注册【废弃】
-         * （因为上一个页面已经无法跳转到这个页面, 所以这个几个方法注定是废弃的）
+		 * 根据页面状态（注册，编辑，新增）添加车牌注册
 		 */
 		registerSubmit: function registerSubmit() {
             let _this = this;
@@ -658,24 +657,26 @@ export default {
 				return alert(myVerifyAll.message);
             }
             
-			// 判断页面状态
-			if (this.pageType === 'register') { // 注册状态
-				ajaxs.register(
-                    this.userinfo,
-					this.carNoComponents.carNo, // 车牌号
-					this.carNoComponents.carType, // 车牌类型
-					this.platVin, // 车架号
-					this.carBrand, // 品牌
-					this.carSeries, // 型号
-					this.carYears, // 年份
-                    this.carYearModel, // 车辆具体型号
-				).then(function () {
-                    _this.jumpHandleBystaus();
-                  
-				}, function (error) {
-					alert('注册失败, 原因:' + error);
-				})
-			} else if (this.pageType === 'editor') { // 编辑状态
+            // 注册状态已废弃（因为上一个页面已经无法跳转到这个页面, 这个几个方法注定是废弃的）
+			// if (this.pageType === 'register') { // 注册状态
+			// 	ajaxs.register(
+            //         this.userinfo,
+			// 		this.carNoComponents.carNo, // 车牌号
+			// 		this.carNoComponents.carType, // 车牌类型
+			// 		this.platVin, // 车架号
+			// 		this.carBrand, // 品牌
+			// 		this.carSeries, // 型号
+			// 		this.carYears, // 年份
+            //         this.carYearModel, // 车辆具体型号
+			// 	).then(function () {
+            //         _this.jumpHandleBystaus();
+			// 	}, function (error) {
+			// 		alert('注册失败, 原因:' + error);
+			// 	});
+            // } else 
+            
+            // 判断是否编辑状态
+            if (this.pageType === 'editor') { // 编辑状态
 				ajaxs.saveCar(
                     this.userinfo,
 					this.$route.query.CarID, // 车唯一标识
@@ -688,8 +689,9 @@ export default {
 					this.carYearModel, // 车辆具体型号
 					this.isDefaultSetting, // 是否默认车辆
 				).then(function () {
-                    if(window.localStorage.getItem('isyuyue')=='1'){
-                        window.location.href = `../carReservation/index.html#/?carNo=${_this.carNoProvince + _this.plateNo}&brand=${_this.carBrand}&series=${_this.carSeries}&years=${_this.carYears}&model=${_this.carYearModel}&openId=${window.localStorage.getItem('openId')}&name=${window.localStorage.getItem('name')}`
+                    // 判断是否理车云
+                    if( window.localStorage.callBackUrl == 'carReservation' ){
+                        window.location.href = `../carReservation/index.html#/?carNo=${_this.carNoProvince + _this.plateNo}&brand=${_this.carBrand}&series=${_this.carSeries}&years=${_this.carYears}&model=${_this.carYearModel}&openId=${window.localStorage.openid}&name=${window.localStorage.objectName}`
                        
                     } else {
                         window.history.back(-1);
@@ -712,8 +714,9 @@ export default {
 					this.carYearModel, // 车辆具体型号
 					this.isDefaultSetting, // 是否默认车辆
 				).then(function () {
-					if ( window.localStorage.getItem('isyuyue') === '1' ) {
-                        window.location.href = `../carReservation/index.html#/?carNo=${_this.carNoComponents.plateNo}&brand=${_this.carBrand}&series=${_this.carSeries}&years=${_this.carYears}&model=${_this.carYearModel}&openId=${window.localStorage.getItem('openId')}&name=${window.localStorage.getItem('name')}`
+                    // 判断是否理车云
+					if ( window.localStorage.callBackUrl == 'carReservation' ) {
+                        window.location.href = `../carReservation/index.html#/?carNo=${_this.carNoComponents.plateNo}&brand=${_this.carBrand}&series=${_this.carSeries}&years=${_this.carYears}&model=${_this.carYearModel}&openId=${window.localStorage.openid}&name=${window.localStorage.objectName}`
 
                     } else {
                         window.history.back(-1);
@@ -818,7 +821,9 @@ export default {
 			})
         },
         
-        // 车辆品牌页 点击按钮回顶部
+		/**
+		 * 车辆品牌页 点击按钮回顶部
+		 */
 		goTop: function goTop() {
            let anchorElement = document.getElementById('listTop')
             if (anchorElement) {
@@ -826,7 +831,9 @@ export default {
             }
         },
 
-        // 搜索功能
+		/**
+		 * 搜索功能
+		 */
 		search: function search() {
             this.$refs.input1.blur();  //关闭键盘
             this.initCarBrand()         //调用搜索车辆品牌功能

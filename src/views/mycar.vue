@@ -121,14 +121,19 @@ export default {
 	},
 
 	mounted: function mounted() {
-        this.$store.commit('initCustomerid', this.$route.params.customerid); // 设置到 vuex
-		this.getCarList();
-    },
-    
-	created: function created() {
-        window.localStorage.setItem('isyuyue',this.$route.params.yuyue)
-        window.localStorage.setItem('openId',this.$route.params.openId)
-        window.localStorage.setItem('name',this.$route.params.name)
+        this.$store.commit('initCustomerid', this.$route.params.customerid); // 设置到 vuex 顶部
+
+        window.localStorage.setItem('customerid', this.$route.params.customerid); // 初始化 customerid
+        window.localStorage.setItem('openid', this.$route.params.openid); // 初始化 openid
+
+        // 添加成功 判断回调的 url 以及 项目名称 是否存在 
+        if (this.$route.query && this.$route.query.callBackUrl && this.$route.query.objectName ) {
+            // 如果存在 缓存 数据
+            window.localStorage.setItem('callBackUrl', this.$route.query.callBackUrl); // 初始化 添加成功 回调的 url 链接
+            window.localStorage.setItem('objectName', this.$route.query.objectName); // 添加成功 后的 项目名称
+        }
+
+        this.getCarList(); // 获取车辆信息
     },
 
 	methods: {
@@ -138,7 +143,10 @@ export default {
 		getCarList: function getCarList() {
             var _this = this;
             
-            let carTypeListToValue = (CarType) => {
+            /**
+             * 根据服务器返回的车辆类型 初始化 车牌号数据 转换的函数
+             */
+            let carTypeListToValue = CarType => {
                 let itemCarType = '';
 
                 _this.carTypeList.map(val => {
@@ -146,16 +154,16 @@ export default {
                         itemCarType = val.value;
                     }
                     
-                    return val
+                    return val;
                 });
 
-                return itemCarType
+                return itemCarType;
             }
 
-			ajaxs.getCarList(this.$route.params.customerid)
+			ajaxs.getCarList(window.localStorage.customerid)
 			.then(function (carList) {
-                    // 判断数据是否为空
-                    if (carList.length != 0) {
+                    // 判断数据是否不为空
+                    if (carList.length !== 0) {
                         _this.carList = carList.map(function (item, key) {
                             return {
                                 nativeData: JSON.parse(JSON.stringify(item)),
@@ -168,7 +176,8 @@ export default {
                         });
 					
 				    } else {
-                        // 否则跳转到新增车辆信息页面
+                        // 如果无车辆信息
+                        // 跳转到新增车辆信息页面
 			            _this.$router.replace({ path: '/supplement/creater' });
 				    }
                 
@@ -178,7 +187,9 @@ export default {
 
 		},
 
-        // 选择车辆
+        /**
+         * 选择车辆的方法
+         */
         changeCar(val) {
             let _this = this
             ajaxsSupplement.saveCar(
@@ -194,10 +205,12 @@ export default {
                 '1', // 是否默认车辆
             ).then(() => {
                 // 判断是否理车云
-                // 如果是理车云跳转的路径不一样的
-                if ( window.localStorage.getItem('isyuyue') == '1' ) {
-                    window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.getItem('openId')}&name=${window.localStorage.getItem('name')}`
+                if ( window.localStorage.callBackUrl == 'carReservation' ) {
+                    // 如果是理车云跳转的路径不一样的
+                    window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.openid}&name=${window.localStorage.objectName}`;
+
                 } else {
+                    // 如果不是理车云的项目, 从哪里来的跳转到哪里去
                     window.history.back(-1);
                 }
 
@@ -233,19 +246,17 @@ export default {
                 .then(function () {
                     // 删除成功, 再次获取一一次车辆信息
                     _this.getCarList();
+
                 }, function (error) {
                     alert(error);
+
                 });
-                // if(IsDefault){
-                //     return alert('默认车辆不可删除')
-                // } else {
-                // }
             }
 				
 		},
 
 		/**
-		 * 开始触摸车辆列表 (用于删除)
+		 * 初始化 触摸车辆列表 (用于删除)
 		 */
 		itemTouchStart: function itemTouchStart(item, key, startEvent) {
 			var _this = this;

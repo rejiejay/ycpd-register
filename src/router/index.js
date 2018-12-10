@@ -6,10 +6,11 @@ Vue.use(Router);
 const routes = [
     /**
      * 注册
-     * 因为有持久化的需求
+     * 因为有持久化的需求 所以需要携带openid的
+     * @param {String} customerid 养车频道 用户openid o9rEN0_rX4ySFsIbKi5MBL8YGnAg
      */
     {
-        path: '/index/:openid', // 微信 用户标识 o9rEN0_rX4ySFsIbKi5MBL8YGnAg
+        path: '/index/:openid',
         component: () => import('@/views/register/index'),
         children: [
             {
@@ -29,10 +30,16 @@ const routes = [
 
     /**
      * 我的车辆列表
+     * 目前 只有两个地方会跳转到这里来， 
+     * 第一个地方是 车主入口 http://svn.hotgz.com:3390/svn/YCPD_Designer/主站点前端/车主端
+     * 第二个地方是 车主入口预约 http://svn.hotgz.com:3390/svn/YCPD_Designer/其他项目前端/车主入口预约
      * @param {String} customerid 养车频道 用户标识 180910010001949590
+     * @param {String} openid 养车频道 用户openid o9rEN0_rX4ySFsIbKi5MBL8YGnAg
+     * @param {String} yuyue 有一个需求是从哪里来，然后跳转到哪里去，所以这里有一个预约
+     * @param {String} name 这是名称
      */
     {
-        path: '/mycar/:customerid/:yuyue/:openId/:name',
+        path: '/mycar/:customerid/:openid',
         component: () => import('@/views/mycar'),
         meta: { title: '我的车辆' },
     }, 
