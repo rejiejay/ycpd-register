@@ -69,8 +69,8 @@
                     </svg>
                 </div>
 
-                <div class="register-agreement-text">
-                    我已阅读并同意<span @click="jumpToAgreement">《养车频道用户服务协议》</span>
+                <div class="register-agreement-text" @click="jumpToAgreement">
+                    我已阅读并同意<span>《养车频道用户服务协议》</span>
                 </div>
             </div>
         </div>
@@ -288,7 +288,7 @@ export default {
 		 * 跳转到 养车频道用户服务协议
 		 */
 		jumpToAgreement: function jumpToAgreement() {
-			this.$router.push({ path: 'agreement', });
+            window.location.href = `${window.location.pathname}#/index/${window.localStorage.openid}/agreement`;
 		},
 
 		/**
@@ -346,16 +346,20 @@ export default {
 
                 // 判断页面状态  根据状态去跳转对应的页面
                 if ( window.localStorage.getItem('pageType') === 'piccPage' || window.localStorage.getItem('pageType') === '人保' ) {
+                    window.localStorage.removeItem('pageType');
                     window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.getItem('openid')}&name=人保`;
 
                 } else if ( window.localStorage.getItem('pageType') === '平安' ) {
+                    window.localStorage.removeItem('pageType');
                     window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.getItem('openid')}&name=平安`;
 
                 } else if ( window.localStorage.getItem('pageType') === 'LCY' ) {
+                    window.localStorage.removeItem('pageType');
                     window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.getItem('openid')}&name=理车云`;
 
                 } else if ( window.localStorage.getItem('pageType') === 'gasStation' ) {
-
+                    window.localStorage.removeItem('pageType');
+                    
                     // 获取定位
                     if( window.localStorage.getItem('latitude') && window.localStorage.getItem('longitude') ) {
                         latitude = window.localStorage.getItem('latitude');
@@ -378,6 +382,7 @@ export default {
                     }
 
                 } else {
+
                     // 否则这就 哪里点的就回哪里
                     window.history.back(-1); 
                 }
@@ -394,12 +399,7 @@ export default {
                 ).then(function () {
 
                     Toast({ message: '注册成功', duration: 2000 }); // 弹出提示
-                    setTimeout(() => {
-                        /**
-                         * 注册成功后，【第三步】 根据状态去跳转对应的页面
-                         */
-                        jumpHandleBystaus();
-                    }, 2000);
+                    jumpHandleBystaus();
                 
                 }, function (error) {
                     alert('注册失败');
