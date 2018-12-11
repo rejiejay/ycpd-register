@@ -166,7 +166,7 @@ export default {
 		return new Promise(function (resolve, reject) {
 			$.get(config.url.getCarModelByVin, {vin: vin, openid: window.localStorage.openid}, function(response, status, xhr) {
 				Indicator.close();
-				if (response && response.Code === 200 && response.Data instanceof Array && response.Data.length > 0) {
+				if (response && response.Code === 200 && res.Msg === "" && response.Data instanceof Array && response.Data.length > 0) {
 					resolve(response.Data[0]);
 				} else {
 					reject('获取车辆具体型号列表失败,请手动选择');
