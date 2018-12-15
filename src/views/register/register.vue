@@ -321,7 +321,7 @@ export default {
             /**
              * 【第三步】 根据状态去跳转对应的页面
              */
-            let jumpHandleBystaus = () => {
+            var jumpHandleBystaus = () => {
                 let latitude = 114;
                 let longitude = 22.7;
 
@@ -399,8 +399,10 @@ export default {
                 ).then(function () {
 
                     Toast({ message: '注册成功', duration: 2000 }); // 弹出提示
-                    jumpHandleBystaus();
-                
+                    setTimeout(function () {
+                        jumpHandleBystaus();
+                    }, 1999);
+                    
                 }, function (error) {
                     alert('注册失败');
                 })
