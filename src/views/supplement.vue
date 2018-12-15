@@ -315,17 +315,7 @@ export default {
 		}
     },
 
-    computed: {
-        /**
-         * 顶层 vuex 用户信息
-         */
-        userinfo: function userinfo() {
-            return this.$store.getters.statesGetters;
-        }
-    },
-
 	mounted: function mounted() {
-        // console.log(this.userinfo)
 		let _this = this;
 		
 		// 页面状态 初始化
@@ -657,28 +647,11 @@ export default {
 				return alert(myVerifyAll.message);
             }
             
-            // 注册状态已废弃（因为上一个页面已经无法跳转到这个页面, 这个几个方法注定是废弃的）
-			// if (this.pageType === 'register') { // 注册状态
-			// 	ajaxs.register(
-            //         this.userinfo,
-			// 		this.carNoComponents.carNo, // 车牌号
-			// 		this.carNoComponents.carType, // 车牌类型
-			// 		this.platVin, // 车架号
-			// 		this.carBrand, // 品牌
-			// 		this.carSeries, // 型号
-			// 		this.carYears, // 年份
-            //         this.carYearModel, // 车辆具体型号
-			// 	).then(function () {
-            //         _this.jumpHandleBystaus();
-			// 	}, function (error) {
-			// 		alert('注册失败, 原因:' + error);
-			// 	});
-            // } else 
-            
             // 判断是否编辑状态
             if (this.pageType === 'editor') { // 编辑状态
+
 				ajaxs.saveCar(
-                    this.userinfo,
+                    window.localStorage.customerid,
 					this.$route.query.CarID, // 车唯一标识
 					this.carNoComponents.carNo, // 车牌号
                     this.carNoComponents.carType, // 车牌类型
@@ -690,7 +663,8 @@ export default {
 					this.isDefaultSetting, // 是否默认车辆
 				).then(function () {
                     // 判断是否理车云
-                    if( window.localStorage.callBackUrl == 'carReservation' ){
+                    if( window.localStorage.callBackUrl === 'carReservation' ) {
+                        window.localStorage.removeItem('callBackUrl');
                         window.location.href = `../carReservation/index.html#/?carNo=${_this.carNoProvince + _this.plateNo}&brand=${_this.carBrand}&series=${_this.carSeries}&years=${_this.carYears}&model=${_this.carYearModel}&openId=${window.localStorage.openid}&name=${window.localStorage.objectName}`
                        
                     } else {
@@ -701,9 +675,10 @@ export default {
 				}, function (error) {
 					alert(error);
 				});
-			} else if (this.pageType === 'creater') { // 新增状态
+            } else if (this.pageType === 'creater') { // 新增状态
+
 				ajaxs.saveCar(
-                    this.userinfo,
+                    window.localStorage.customerid,
 					false, // 车唯一标识 false 表示新增
 					this.carNoComponents.carNo, // 车牌号
                     this.carNoComponents.carType, // 车牌类型
@@ -715,7 +690,8 @@ export default {
 					this.isDefaultSetting, // 是否默认车辆
 				).then(function () {
                     // 判断是否理车云
-					if ( window.localStorage.callBackUrl == 'carReservation' ) {
+					if ( window.localStorage.callBackUrl === 'carReservation' ) {
+                        window.localStorage.removeItem('callBackUrl');
                         window.location.href = `../carReservation/index.html#/?carNo=${_this.carNoComponents.plateNo}&brand=${_this.carBrand}&series=${_this.carSeries}&years=${_this.carYears}&model=${_this.carYearModel}&openId=${window.localStorage.openid}&name=${window.localStorage.objectName}`
 
                     } else {
@@ -757,15 +733,19 @@ export default {
 
             // 判断页面状态  根据状态去跳转对应的页面
             if ( window.localStorage.getItem('pageType') === 'piccPage' || window.localStorage.getItem('pageType') === '人保' ) {
+                window.localStorage.removeItem('pageType');
                 window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.getItem('openid')}&name=人保`;
 
             } else if ( window.localStorage.getItem('pageType') === '平安' ) {
+                window.localStorage.removeItem('pageType');
                 window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.getItem('openid')}&name=平安`;
 
             } else if ( window.localStorage.getItem('pageType') === 'LCY' ) {
+                window.localStorage.removeItem('pageType');
                 window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.getItem('openid')}&name=理车云`;
 
             } else if ( window.localStorage.getItem('pageType') === 'gasStation' ) {
+                window.localStorage.removeItem('pageType');
 
                 // 获取定位
                 if( window.localStorage.getItem('latitude') && window.localStorage.getItem('longitude') ) {
@@ -799,26 +779,25 @@ export default {
          * （因为上一个页面已经无法跳转到这个页面, 所以这个几个方法注定是废弃的）
 		 */
 		notToRegister: function notToRegister() {
-            const _this = this;
+            // const _this = this;
 
-            // 校验车牌号码 组件已经校验好了
-            if (this.carNoComponents.verify === false) {
-				return alert(this.carNoComponents.message);
-            }
+            // // 校验车牌号码 组件已经校验好了
+            // if (this.carNoComponents.verify === false) {
+			// 	return alert(this.carNoComponents.message);
+            // }
 
-			ajaxs.register(
-                this.userinfo, 
-                this.carNoComponents.carNo, // 车牌号
-                this.carNoComponents.carType, // 车牌类型
-            ).then(function () {
-                /**
-                 * 注册成功后，跳转到
-                 */
-                _this.jumpHandleBystaus();
+			// ajaxs.register(
+            //     this.carNoComponents.carNo, // 车牌号
+            //     this.carNoComponents.carType, // 车牌类型
+            // ).then(function () {
+            //     /**
+            //      * 注册成功后，跳转到
+            //      */
+            //     _this.jumpHandleBystaus();
                
-			}, function (error) {
-				alert('注册失败');
-			})
+			// }, function (error) {
+			// 	alert('注册失败');
+			// })
         },
         
 		/**

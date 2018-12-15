@@ -89,6 +89,7 @@ import { Toast } from 'mint-ui';
 // 请求类
 import ajaxs from "@/api/register";
 import supplementAjaxs from "@/api/supplement";
+import createErrorLogMsg from "@/api/createErrorLogMsg";
 // 自定义组件类
 import Consequencer from "@/utils/Consequencer";
 import wxLocation from "@/components/wxLocation";
@@ -136,15 +137,12 @@ export default {
 			
 			// 是否同意协议
             isAgreement: false,
-        }
-    },
 
-    computed: {
-        /**
-         * 顶层 vuex 用户信息
-         */
-        userinfo: function userinfo() {
-            return this.$store.getters.statesGetters;
+            // 微信用户唯一标识 openid
+            openid: '',
+
+            // 用户所在城市 反正不管获取成功和失败 都
+            city: '深圳',
         }
     },
 
@@ -162,11 +160,13 @@ export default {
          * 页面初始化
          */
         initPageData: function initPageData() {
+            createErrorLogMsg(`用户注册页面初始化 by 用户openid: ${this.$route.params.openid}`);
+
             var _this = this;
             
             // 判断openid 的合法性 并且 缓存openid 
             if (this.$route.params.openid && this.$route.params.openid.length > 15) {
-                this.$store.commit('initOpenid', this.$route.params.openid); // 设置到 vuex
+                this.openid = this.$route.params.openid;
                 window.localStorage.setItem('openid', this.$route.params.openid)  // 本地存储 openid， 其他地方会用到
 
             // 如果 openid 不存在
@@ -182,12 +182,15 @@ export default {
                 }
             }
     
-            // 初始化位置信息
+            /**
+             * 初始化位置信息
+             * 因为注册时会用的到
+             */
             wxLocation.init()
             .then(function(position) {
                 wxLocation.getCityName(position)
                 .then(function(cityName) {
-                    _this.$store.commit('initCity', cityName); // 设置到 vuex
+                    _this.city = cityName;
                 });
             });
         },
@@ -292,8 +295,7 @@ export default {
 		},
 
 		/**
-		 * 校验验证号码是否正确
-		 * 并且跳转到下一页
+		 * 注册
 		 */
 		submitRegister: function submitRegister() {
 			var _this = this;
@@ -336,7 +338,7 @@ export default {
                             action: "GetStation",
                             lattude: latitude,
                             lontude: longitude,
-                            openid: window.localStorage.getItem('openid'),
+                            openid: window.localStorage.openid,
                         },
                         success: function(datas) {
                             window.location.href = datas.Url;
@@ -392,11 +394,21 @@ export default {
              * 【第二步】 暂不添加车辆信息 注册
              */
             let notAddCarInforToRegister = () => {
-                supplementAjaxs.register(
-                    _this.userinfo, 
-                    _this.carNoComponents.carNo, // 车牌号
-                    _this.carNoComponents.carType, // 车牌类型
-                ).then(function () {
+
+                // 初始化提交的数据
+                let submitData = {
+                    OpenID: _this.openid,
+                    City: _this.city,
+                    Mobile: _this.phoneValue,
+                    VerifyCode: _this.verifyNumber,
+                    CarNo: _this.carNoComponents.carNo,
+                    CarType: _this.carNoComponents.carType,
+                }
+
+                createErrorLogMsg(`用户注册 by 用户openid: ${_this.openid}, 提交数据为: ${JSON.stringify(submitData)}`);
+
+                ajaxs.notAddCarInforToRegister(submitData)
+                .then(function () {
 
                     Toast({ message: '注册成功', duration: 2000 }); // 弹出提示
                     setTimeout(function () {
@@ -413,25 +425,8 @@ export default {
              */
 			ajaxs.verifyMobileCodeNumber(this.phoneValue, this.verifyNumber)
 			.then(function () {
-                // 原本是应该跳转到 车辆信息 
-                // 考虑需求会改动，这段代码就不删掉了，以后可能会有添加车辆信息的需求
-                /**
-                 * 存储数据到 vuex (全局)
-                 * 简单的跳转逻辑犯不着用 vuex，徒增复杂度
-                 * 直接路由带过去就行了
-                 */
-                _this.$store.commit('initPhone', { 
-                    mobile: _this.phoneValue,
-                    verifyCode: _this.verifyNumber,
-                });
-				// _this.replaceToRouter('/supplement/register', {
-                //     mobile: _this.phoneValue,
-                //     verifyCode: _this.verifyNumber,
-                //     carNo: _this.carNoComponents.carNo,
-                //     carType: _this.carNoComponents.carType,
-                // });
-
-                notAddCarInforToRegister(); // 校验手机号码成功 【第二步】暂不添加车辆信息 注册
+                // 校验手机号码成功 【第二步】暂不添加车辆信息 注册
+                notAddCarInforToRegister(); 
 			}, function (error) {
 				alert(error);
 			});

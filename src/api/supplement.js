@@ -176,7 +176,7 @@ export default {
 	},
 
     /**
-     * 车主注册
+     * 车主注册【这个已经废弃】
 	 * 以后不要这么传参数，传一个 对象的可控性比较高
 	 * @param {String} CarNo 车牌号
 	 * @param {String} CarType 车牌类型
@@ -242,6 +242,7 @@ export default {
 
     /**
      * 添加/编辑车主汽车
+	 * @param {String} customerid 养车频道 用户标识
 	 * @param {String} CarID 车唯一标识 存在表示 编辑 false 表示新增
 	 * @param {String} CarNo 车牌号
 	 * @param {String} CarType 车牌类型
@@ -251,14 +252,9 @@ export default {
 	 * @param {String} Years 年份
 	 * @param {String} Model 车型
 	 * @param {boolean} IsDefault 是否默认
-	 * 
-	 * @param {String} userinfo.customerid 养车频道 用户标识
      */
-	saveCar: function saveCar(userinfo, CarID, CarNo, CarType, VinNo, Brand, Series, Years, Model, IsDefault) {
-		var CustomerID = userinfo.customerid;
-
+	saveCar: function saveCar(customerid, CarID, CarNo, CarType, VinNo, Brand, Series, Years, Model, IsDefault) {
 		Indicator.open('正在提交数据...');
-
 		// 所有信息
 		var submitData = {
 			CarNo: CarNo,
@@ -268,7 +264,7 @@ export default {
 			Series: Series,
 			Years: Years,
 			Model: Model,
-			CustomerID: CustomerID,
+			CustomerID: customerid,
 			IsDefault: IsDefault ? 1 : 0, 
 		}
 

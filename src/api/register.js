@@ -70,4 +70,36 @@ export default {
 			});
 		});
 	},
+
+	/**
+	 * 暂不添加车辆信息 注册
+	 * @param {String} OpenID 微信用户唯一标识 openid (必填)
+	 * @param {String} City 所在城市 (必填)
+	 * @param {String} Mobile 用户手机号 (必填)
+	 * @param {String} VerifyCode 手机验证码 (必填)
+	 * @param {String} CarNo 车牌号 (必填) 
+	 * @param {String} CarType 车型 (必填) 
+	 */
+	notAddCarInforToRegister: function notAddCarInforToRegister(parameter) {
+		return new Promise(function (resolve, reject) {
+			$.ajax({
+				url: config.url.register,
+				type: "POST",
+				dataType : 'json',
+				data: parameter,
+				success: function(res){
+					Indicator.close();
+					if (res && res.Code === 200 && res.Msg === '') {
+						resolve(res);
+					} else {
+						reject(`注册失败，原因: ${res.Msg}`);
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					Indicator.close();
+					reject(`向服务器发起请求车主注册失败，原因: ${errorThrown}`);
+				}
+			});
+		});
+	},
 };

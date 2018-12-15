@@ -62,10 +62,6 @@ export default {
 				// }
             ],
 
-            userinfo: {
-                customerid: this.$route.params.customerid
-            }, 
-
             carTypeList: [
                 // 小型车 小轿车 普通的车
                 {
@@ -121,8 +117,6 @@ export default {
 	},
 
 	mounted: function mounted() {
-        this.$store.commit('initCustomerid', this.$route.params.customerid); // 设置到 vuex 顶部
-
         window.localStorage.setItem('customerid', this.$route.params.customerid); // 初始化 customerid
         window.localStorage.setItem('openid', this.$route.params.openid); // 初始化 openid
 
@@ -180,7 +174,7 @@ export default {
                         // 跳转到新增车辆信息页面
 			            _this.$router.replace({ path: '/supplement/creater' });
 				    }
-                
+
 			}, function (error) {
 				alert(error);
 			});
@@ -193,7 +187,7 @@ export default {
         changeCar(val) {
             let _this = this
             ajaxsSupplement.saveCar(
-                _this.userinfo,
+                window.localStorage.customerid,
                 val.CarID, // 车唯一标识
                 val.CarNo, // 车牌号
                 val.CarType ? val.CarType : '小车', // 车牌型号
@@ -207,6 +201,7 @@ export default {
                 // 判断是否理车云
                 if ( window.localStorage.callBackUrl == 'carReservation' ) {
                     // 如果是理车云跳转的路径不一样的
+                    window.localStorage.removeItem('callBackUrl');
                     window.location.href = `../carReservation/index.html#/?openId=${window.localStorage.openid}&name=${window.localStorage.objectName}`;
 
                 } else {
@@ -223,7 +218,7 @@ export default {
 		 */
 		jumpToEditor: function jumpToEditor(nativeData) {
 
-            this.$store.commit('initCarid', nativeData.CarID); // 设置到 vuex
+            window.localStorage.setItem('carId', nativeData.CarID);
 			this.$router.push({ path: '/supplement/editor', query: nativeData });
 		},
 
