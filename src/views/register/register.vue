@@ -79,6 +79,21 @@
         <div class="register-submit" @click="submitRegister">
             <div class="register-submit-content">确认</div>
         </div>
+
+        <!-- 注册有误 模态框 -->
+        <div class="register-error-modal flex-center" v-if="isRegisterErrorShow">
+            <div class="error-modal-shade" @click="isRegisterErrorShow = false;"></div>
+
+            <div class="error-modal-container">
+                <div class="modal-row-container">
+                    <div class="modal-row-main">{{registerErrorTitle}}</div>
+                    <div class="modal-row">{{registerError}}</div>
+                    <div class="modal-row">联系客服: <a href="tel://4001106558">400-1106-558</a></div>
+                </div>
+
+                <div class="error-modal-submit flex-center" @click="historyBack(); isRegisterErrorShow = false;">返回上一页</div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -89,7 +104,6 @@ import { Toast } from 'mint-ui';
 // 请求类
 import ajaxs from "@/api/register";
 import supplementAjaxs from "@/api/supplement";
-import createErrorLogMsg from "@/api/createErrorLogMsg";
 // 自定义组件类
 import Consequencer from "@/utils/Consequencer";
 import wxLocation from "@/components/wxLocation";
@@ -143,6 +157,11 @@ export default {
 
             // 用户所在城市 反正不管获取成功和失败 都
             city: '深圳',
+
+            // 注册有误 模态框
+            isRegisterErrorShow: false,
+            registerErrorTitle: '注册有误',
+            registerError: '注册信息有误',
         }
     },
 
@@ -160,8 +179,6 @@ export default {
          * 页面初始化
          */
         initPageData: function initPageData() {
-            createErrorLogMsg(`用户注册页面初始化 by 用户openid: ${this.$route.params.openid}`);
-
             var _this = this;
             
             // 判断openid 的合法性 并且 缓存openid 
@@ -171,15 +188,10 @@ export default {
 
             // 如果 openid 不存在
             } else {
-                // 提示重新获取（非常重要）
-                if (confirm('获取微信用户信息失败, 是否重新获取?')) {
-                    window.location.href = config.YcpdUrlWidthWxCode(); // 重新获取 code
-
-                } else {
-                    // 如果不进行重新获取 弹出报错信息 返回上一页
-                    alert('注册失败, 无法获取微信openid, 请联系客服人员.');
-                    window.history.back(-1);
-                }
+                // 弹出提示信息
+                this.isRegisterErrorShow = true; // 弹出 提示 模态框
+                this.registerErrorTitle = '无法注册'; // 设置 提示 标题
+                this.registerError = '获取微信用户信息失败'; // 设置 提示 内容
             }
     
             /**
@@ -405,8 +417,6 @@ export default {
                     CarType: _this.carNoComponents.carType,
                 }
 
-                createErrorLogMsg(`用户注册 by 用户openid: ${_this.openid}, 提交数据为: ${JSON.stringify(submitData)}`);
-
                 ajaxs.notAddCarInforToRegister(submitData)
                 .then(function () {
 
@@ -416,7 +426,10 @@ export default {
                     }, 1999);
                     
                 }, function (error) {
-                    alert('注册失败');
+                    // 弹出提示信息（非常重要）
+                    _this.isRegisterErrorShow = true; // 弹出 提示 模态框
+                    _this.registerErrorTitle = '注册失败'; // 设置 提示 标题
+                    _this.registerError = `${error}`; // 设置 提示 内容
                 })
             }
 
@@ -430,7 +443,14 @@ export default {
 			}, function (error) {
 				alert(error);
 			});
-		},
+        },
+        
+        /**
+         * 返回上一页
+         */
+        historyBack: function historyBack() {
+            window.history.back(-1);
+        },
 
         /**
          * 重定向到路由
@@ -460,6 +480,10 @@ export default {
 @machine-verify-modal-z-index: 2;
 @machine-verify-shade-z-index: 2;
 @machine-verify-content-z-index: 3;
+// 注册有误 模态框
+@register-error-modal-z-index: 2;
+@register-error-shade-z-index: 3;
+@register-error-container-z-index: 4;
 
 .register {
     position: relative;
@@ -679,6 +703,64 @@ export default {
         text-align: center;
         color: #fff;
         background-color: #E50012;
+    }
+}
+
+// 注册有误 模态框
+.register-error-modal {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: @register-error-modal-z-index;
+
+    .error-modal-shade {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: @register-error-shade-z-index;
+        background:rgba(0, 0, 0, 0.46);
+    }
+
+    .error-modal-container {
+        position: relative;
+        width: 280px;
+        border-radius: 10px;
+        background-color: #fff;
+        z-index: @register-error-container-z-index;
+    }
+
+    .modal-row-container {
+        padding: 15px;
+
+        .modal-row-main {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            padding-top: 10px;
+            padding-bottom: 15px;
+            color: @black1;
+        }
+
+        .modal-row {
+            font-size: 14px;
+            color: @black2;
+            padding-bottom: 5px;
+
+            a {
+                color: #2F8AFF;
+                text-decoration: underline;
+            }
+        }
+    }
+
+    .error-modal-submit {
+        border-top: 1px solid #ddd;
+        height: 45px;
+        color: #2F8AFF;
     }
 }
 
